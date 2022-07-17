@@ -304,7 +304,7 @@ def estimating_accuracy(BOOM_geostandards,BOOM_geostandards_ref):
     BOOM_geostandards = BOOM_geostandards.replace('> 10000',-1)
     
     # filtrating measurement runs where certified geostandards have been analyzed
-    BOOM_geostandards_certified = BOOM_geostandards[BOOM_geostandards.StandardID.isin(BOOM_geostandards_ref[BOOM_geostandards_ref.error.isin(["95%CL","SD"])].StandardID.unique().tolist())].copy()
+    BOOM_geostandards_certified = BOOM_geostandards[BOOM_geostandards.StandardID.isin(BOOM_geostandards_ref[BOOM_geostandards_ref.ErrorType.isin(["95%CL","SD"])].StandardID.unique().tolist())].copy()
 
     for elemento in elementos:
         MeasuredVsRef[elemento] = MeasuredVsRef[elemento].astype('float64')
