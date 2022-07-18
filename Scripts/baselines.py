@@ -277,7 +277,7 @@ gráfico(Xtest_imp.iloc[ind_volcan_test.tolist(),:],y_test[ind_volcan_test.tolis
 # Plot confusion matrix
 cm = confusion_matrix(y_test,est.predict(T_test))
 cm = (cm.T/cm.sum(axis=1)).T
-plt.imshow(cm)
+plt.imshow(cm,cmap=plt.get_cmap('viridis'))
 plt.colorbar()
 plt.ylabel('True label')
 plt.xlabel('Predicted label')
