@@ -30,6 +30,8 @@ class GridSearchCV_with_groups():
         values = self.param_grid.values()
         combinations = [
             dict(zip(keys, combination)) for combination in product(*values)]
+        
+        print(combinations)
 
         gss = GroupShuffleSplit(
             test_size=self.cv_test_size, n_splits=self.cv_n_splits)
@@ -59,7 +61,7 @@ class GridSearchCV_with_groups():
         self.best_estimator_ = clone(
             self.estimator.set_params(**self.best_params_))
         self.best_estimator_.fit(X, y)
-
+    
     def predict(self, X):
         return self.best_estimator_.predict(X)
 
