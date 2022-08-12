@@ -8,9 +8,10 @@ from functions import colores
 from sklearn.pipeline import Pipeline
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
+from sklearn.base import BaseEstimator, ClassifierMixin
 
+class GridSearchCV_with_groups(BaseEstimator, ClassifierMixin):
 
-class GridSearchCV_with_groups():
     def __init__(self, estimator, param_grid, cv_test_size, cv_n_splits,
                  n_jobs=None):
         self.estimator = estimator
@@ -30,12 +31,10 @@ class GridSearchCV_with_groups():
         values = self.param_grid.values()
         combinations = [
             dict(zip(keys, combination)) for combination in product(*values)]
-        
-        print(combinations)
 
         gss = GroupShuffleSplit(
             test_size=self.cv_test_size, n_splits=self.cv_n_splits)
-
+        
         scores = np.empty((self.cv_n_splits, len(combinations)))
 
         for i, (train, test) in enumerate(gss.split(X, groups=groups)):
@@ -60,39 +59,40 @@ class GridSearchCV_with_groups():
         # Refit on the whole dataset with the best paraps
         self.best_estimator_ = clone(
             self.estimator.set_params(**self.best_params_))
+
         self.best_estimator_.fit(X, y)
-    
+
     def predict(self, X):
         return self.best_estimator_.predict(X)
 
     def score(self, X, y):
         return self.best_estimator_.score(X, y)
 
-
-def plot_scatterplots(X_volcanoes, yv, X_test_out, yv_test_out, best_est, pred,
-                      volcano_list, target_type='volcano'):
+def plot_scatterplots(X_volcanoes, yv, X_test_out, yv_test_out, A, B, est, pred,
+                      volcano_list, name= 'default', target_type='volcano', save='yes'):
 
     ind_wrong = pred != yv_test_out
 
-    X_test_imp = Pipeline(best_est.steps[:-1]).transform(X_test_out)
+    X_test_imp = Pipeline(est.best_estimator_.steps[:-2]).fit_transform(X_test_out)
     X_test_imp = pd.DataFrame(X_test_imp, columns=X_test_out.columns)
-
+    yv_test_names = volcano_list[yv_test_out]
+    
     # Plot Original data (how are missing values treated?)
     # Only fully observed points plotted?
-    fig, axes = plt.subplots(1, 3, figsize=(15, 4), sharex=False, sharey=False)
+    fig, axes = plt.subplots(1, 3, figsize=(15, 4), sharex=True, sharey=True)
     A = 'SiO2_normalized'
     B = 'K2O_normalized'
     yv_names = volcano_list[yv]
     sns.scatterplot(
-        x=X_volcanoes.loc[:, A], y=X_volcanoes.loc[:, B],
-        hue=yv_names, alpha=0.7,
-        palette=colores(yv_names, target_type), ax=axes[0]
+        x=X_test_out.loc[:, A], y=X_test_out.loc[:, B],
+        hue=yv_test_names, alpha=0.7,
+        palette=colores(yv_test_names, target_type), ax=axes[0]
     )
     axes[0].set_title("Original data")
     axes[0].legend(loc='center left', bbox_to_anchor=(0, -0.65), ncol=2)
 
     # Plot Imputed data with ground truth labels
-    yv_test_names = volcano_list[yv_test_out]
+    
     sns.scatterplot(
         x=X_test_imp.loc[:, A], y=X_test_imp.loc[:, B],
         hue=yv_test_names, alpha=0.7,
@@ -122,13 +122,14 @@ def plot_scatterplots(X_volcanoes, yv, X_test_out, yv_test_out, best_est, pred,
         "Imputed and normalized test data \n with predicted labels")
     axes[2].legend(loc='center left', bbox_to_anchor=(0, -0.65), ncol=2)
 
+    if save == 'yes':
+        plt.savefig('../Plots/'+name + A+'vs'+B+'.png',dpi = 300,bbox_inches='tight',facecolor='w')
 
-def plot_confusion_matrix(yv_test_names, yv_pred_names, labels):
+def plot_confusion_matrix(yv_test_names, yv_pred_names, labels,name='default',save='yes'):
+    
     fig = plt.figure(figsize=(8, 8))
     ax = fig.add_subplot(111)
-    cm = confusion_matrix(
-        yv_test_names, yv_pred_names, labels=labels, normalize='true'
-    )
+    cm = confusion_matrix(yv_test_names, yv_pred_names, labels=labels, normalize='true')
     cm = (cm.T/cm.sum(axis=1)).T
     plt.imshow(cm, cmap='viridis')
     plt.colorbar()
@@ -141,7 +142,8 @@ def plot_confusion_matrix(yv_test_names, yv_pred_names, labels):
     plt.xlabel('Predicted label', fontsize=14)
     plt.xticks(rotation=90)
     fig.show()
-
+    if save == 'yes':
+        plt.savefig('../Plots/'+name+'.png',dpi = 300,bbox_inches='tight',facecolor='w')
 
 # # Cross-validation without grid search
 # # (i.e we take the default hyperparameters of the models)
