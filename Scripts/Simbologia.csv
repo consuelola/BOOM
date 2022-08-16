@@ -1,0 +1,188 @@
+Volcano,Event,Color,Simbología
+Aguilera,A1,lightcoral,3
+Aguilera,Unknown,lightcoral,.
+Antillanca-Casablanca,Rayhuen,#fe4b03,4
+Antillanca-Casablanca,Playas Blanca-Negra,#fe4b03,5
+Antillanca-Casablanca,Nahuel Huapi,#fe4b03,6
+Antillanca-Casablanca,Unknown,#fe4b03,.
+Apagado,Ap1,lightskyblue,4
+Apagado,Unknown,lightskyblue,.
+Arenales,Unknown,palegreen,.
+Monte Burney,Unknown,rosybrown,.
+Monte Burney,MB1910,rosybrown,4
+Monte Burney,MB1,rosybrown,5
+Monte Burney,MB2,rosybrown,6
+Caburga-Huelemolle,Caburga-Huelemolle,rebeccapurple,3
+Caburga-Huelemolle,Unknown,rebeccapurple,.
+Calbuco,Calbuco 1792,green,","
+Calbuco,Calbuco 1893,green,1'
+Calbuco,Calbuco 2015,green,2'
+Calbuco,Calbuco 1961,green,3'
+Calbuco,Calbuco 1971?,green,4'
+Calbuco,Calbuco 1929,green,+'
+Calbuco,Ca1,green,X'
+Calbuco,Ca3,green,|'
+Calbuco,Ca4,green,_'
+Calbuco,Ca5,green,0
+Calbuco,Ca7,green,1
+Calbuco,Ca8,green,2
+Calbuco,Ca10,green,3
+Calbuco,Ca11,green,4
+Calbuco,Alerce Ignimbrite,green,5
+Calbuco,Ca13,green,6
+Calbuco,Ca12,green,7
+Calbuco,Unknown,green,.
+Carrán-Los Venados,Carrán1955,indigo,4
+Carrán-Los Venados,Riñinahue1907,indigo,5
+Carrán-Los Venados,Unknown,indigo,.
+Cay,Unknown,#0a5f38,.
+Chaitén,Cha1,teal,1'
+Chaitén,Cha2,teal,2'
+Chaitén,Cha3,teal,3'
+Chaitén,Cha4,teal,4'
+Chaitén,Grande,teal,+'
+Chaitén,Puma Verde,teal,X'
+Chaitén,Pumalín,teal,|'
+Chaitén,Vcha-2008,teal,_'
+Chaitén,Vilcún,teal,0
+Chaitén,Unknown,teal,.
+Corcovado,COR3,#fa2a55,4
+Corcovado,COR2,#fa2a55,5
+Corcovado,Unknown,#fa2a55,.
+Cordón Cabrera,Unknown,#c69c04,.
+Fueguino,Unknown,deepskyblue,.
+Hornopirén,Ho1,darkblue,4
+Hornopirén,HoSc,darkblue,5
+Hornopirén,Unknown,darkblue,.
+Huanquihue Group,Achen,deeppink,4
+Huanquihue Group,HUA1,deeppink,5
+Huanquihue Group,Unknown,deeppink,.
+Hudson,Ho,#ad03de,4
+Hudson,HW1,#ad03de,5
+Hudson,HW2,#ad03de,6
+Hudson,HW3,#ad03de,7
+Hudson,H1,#ad03de,8
+Hudson,H2,#ad03de,9
+Hudson,HW6,#ad03de,10
+Hudson,HW7,#ad03de,11
+Hudson,Hudson1991,#ad03de,0
+Hudson,Hudson1971,#ad03de,1
+Hudson,Unknown,#ad03de,.
+Huequi,T1,slateblue,4
+Huequi,T2,slateblue,5
+Huequi,T2,slateblue,6
+Huequi,Unknown,slateblue,.
+Lanín,Lan2,#feb209,4
+Lanín,Lan1,#feb209,5
+Lanín,Unknown,#feb209,.
+Lautaro,Unknown,Chocolate,.
+Lautaro,Lautaro1933,Chocolate,4
+Lautaro,Lautaro1876/78-79,Chocolate,5
+Lautaro,Lautaro1959-60,Chocolate,7
+Llaima,2008 Llaima,orange,3'
+Llaima,1994 Llaima,orange,4'
+Llaima,1957 Llaima,orange,+'
+Llaima,1945 Llaima,orange,X'
+Llaima,1780 Llaima,orange,|'
+Llaima,1757 Llaima,orange,_'
+Llaima,1751 Llaima,orange,0
+Llaima,1903 Llaima,orange,1
+Llaima,1640 Llaima,orange,2
+Llaima,1852 Llaima,orange,3
+Llaima,Llaima Pumice,orange,4
+Llaima,Curacautín,orange,5
+Llaima,Curacautín 1,orange,6
+Llaima,Curacautín 2,orange,7
+Llaima,Unknown,orange,.
+Macá,MAC1,#01b44c,4
+Macá,Unknown,#01b44c,.
+Melimoyu,Santa Ana,#80f9ad,4
+Melimoyu,La Junta,#80f9ad,5
+Melimoyu,Unknown,#80f9ad,.
+Mentolat,MEN1,violet,4
+Mentolat,?11.7 ka MEN,violet,5
+Mentolat,MENo,violet,6
+Mentolat,MEN-1,violet,7
+Mentolat,Unknown,violet,.
+Michinmahuida,MIC1,turquoise,4
+Michinmahuida,Lepué,turquoise,5
+test,Yelcho,Paleturquoise,6
+Michinmahuida,Unknown,turquoise,.
+Mocho-Choshuenco,MC1,hotpink,","
+Mocho-Choshuenco,MC2,hotpink,1'
+Mocho-Choshuenco,MC3,hotpink,2'
+Mocho-Choshuenco,Neltume,hotpink,3'
+Mocho-Choshuenco,Pirehueico,hotpink,4'
+Mocho-Choshuenco,MC6,hotpink,+'
+Mocho-Choshuenco,MC7,hotpink,X'
+Mocho-Choshuenco,MC8,hotpink,|'
+Mocho-Choshuenco,Huilo,hotpink,_'
+Mocho-Choshuenco,MC10,hotpink,0
+Mocho-Choshuenco,MC11,hotpink,1
+Mocho-Choshuenco,MC12,hotpink,2
+Mocho-Choshuenco,MC13,hotpink,3
+Mocho-Choshuenco,MC14,hotpink,4
+Mocho-Choshuenco,Enco,hotpink,5
+Mocho-Choshuenco,Hua-hum,hotpink,6
+Mocho-Choshuenco,MC19,hotpink,7
+Mocho-Choshuenco,MC20,hotpink,8
+Mocho-Choshuenco,Pilmaiquén,hotpink,9
+Mocho-Choshuenco,MC22,hotpink,10
+Mocho-Choshuenco,Arauco,hotpink,11
+Mocho-Choshuenco,MC24,hotpink,4'
+Mocho-Choshuenco,Riñihue,hotpink,+'
+Mocho-Choshuenco,MC26,hotpink,X'
+Mocho-Choshuenco,MC27,hotpink,|'
+Mocho-Choshuenco,Unknown,hotpink,.
+Osorno,Osorno1835,#bffe28,5
+Osorno,Osorno1545,#bffe28,6
+Osorno,Cono Los Pumas,#bffe28,7
+Osorno,Cono Appel,#bffe28,8
+Osorno,Unknown,#bffe28,.
+Puntiagudo,Puntiagudo,y,5
+Puntiagudo,Unknown,y,.
+Puyehue-Cordón Caulle,PCC2011,gold,1
+Puyehue-Cordón Caulle,PCC1922,gold,2
+Puyehue-Cordón Caulle,PCC1960,gold,3
+Puyehue-Cordón Caulle,North Cordón Caulle,gold,4
+Puyehue-Cordón Caulle,Mil Hojas,gold,5
+Puyehue-Cordón Caulle,Below Mil hojas,gold,6
+Puyehue-Cordón Caulle,PCC4,gold,7
+Puyehue-Cordón Caulle,Ranco,gold,8
+Puyehue-Cordón Caulle,PCC2,gold,9
+Puyehue-Cordón Caulle,Puyehue 2,gold,10
+Puyehue-Cordón Caulle,Puyehue 1,gold,11
+Puyehue-Cordón Caulle,PCC1,gold,12
+Puyehue-Cordón Caulle,Unknown,gold,.
+Quetrupillán,Quet6,red,4
+Quetrupillán,Quet5,red,5
+Quetrupillán,Puesco,red,6
+Quetrupillán,Quet5?,red,7
+Quetrupillán,Quet3,red,8
+Quetrupillán,Quet2,red,+'
+Quetrupillán,Quet1,red,X'
+Quetrupillán,Unknown,red,.
+Reclus,R1,Paleturquoise,X'
+Reclus,R2/R3,Paleturquoise,5
+Reclus,Unknown,Paleturquoise,.
+Sollipulli,Alpehué,saddlebrown,5
+Sollipulli,Chufquén,saddlebrown,6
+Sollipulli,Unknown,saddlebrown,.
+Subsidiary Vcha dome,Unknown,Paleturquoise,.
+Viedma,Unknown,steelblue,.
+Villarrica,Villarrica 1984,brown,5
+Villarrica,Villarrica 1971,brown,6
+Villarrica,Chaimilla,brown,7
+Villarrica,Pucón,brown,8
+Villarrica,Licán?,brown,9
+Villarrica,Licán,brown,X'
+Villarrica,Unknown,brown,.
+Yanteles,YAN1,yellow,X'
+Yanteles,Unknown,yellow,.
+Yate,Ya2,blue,4
+Yate,YaSc,blue,5
+Yate,Ya1,blue,6
+Yate,Unknown,blue,.
+Tronador,Tronador,darkgreen,5
+Tronador,Unknown,darkgreen,.
+Unknown,Unknown,grey,.
