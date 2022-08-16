@@ -1,56 +1,19 @@
 #Functions for the BOOM TephraDataSet exploration
+from re import X
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
-
-
+from itertools import product
+from sklearn.model_selection import GroupShuffleSplit
+from sklearn.base import clone
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import confusion_matrix
+from sklearn.base import BaseEstimator, ClassifierMixin
+import warnings
+warnings.simplefilter("ignore")
 
 #--------------------- General functions --------------------------------------------------------------
-def sort_BOOM (BOOM_dataset):
-
-    #It is important to sort the columns by group of attributes before doing this
-    sorter = [
-    #Interpretation attributes
-        'properties.Volcano','properties.Event','properties.Vei','properties.Magnitude',
-    #ID attributes - ID
-        'properties.SampleID','properties.SampleObservationID','properties.ISGN',
-    #ID attributes - Position
-        'properties.Location',
-    #ID attributes - Reference
-        'properties.Authors','properties.DOI',
-    #ID attributes - Analysis
-        'properties.TypeOfRegister','properties.TypeOfAnalysis','properties.MeasuredMaterial','properties.AnalyticalTechnique',
-    #Characterization attributes - Stratigraphy
-        'properties.TypeOfSection','properties.SectionID','properties.SubSectionID','properties.SubSection_DistanceFromTop',
-    #Characterization attributes - Age
-        'properties.HistoricalAge',
-        'properties.RadiocarbonLabCode','properties.14C_Age','properties.14C_Age_error','properties.StratigraphicPosition',
-        'properties.40Ar39Ar_Age','properties.40Ar39Ar_Age_Error',
-    #Characterization attributes - Physical properties
-        'properties.DepositColor','properties.DepositThickness_cm','properties.GrainSize_min_mm','properties.GrainSize_max_mm',
-    #Characterization attributes - Geochemistry - major elements
-        'properties.SiO2','properties.TiO2','properties.Al2O3','properties.FeO','properties.Fe2O3','properties.Fe2O3T',
-        'properties.FeOT','properties.MnO','properties.MgO','properties.CaO','properties.Na2O','properties.K2O',
-        'properties.P2O5','properties.Cl','properties.LOI','properties.Total',
-    #Characterization attributes - Geochemistry - trace elements
-        'properties.Rb','properties.Sr','properties.Y','properties.Zr','properties.Nb','properties.Cs','properties.Ba',
-        'properties.La','properties.Ce','properties.Pr','properties.Nd','properties.Sm','properties.Eu','properties.Gd',
-        'properties.Tb','properties.Dy','properties.Ho','properties.Er','properties.Tm','properties.Yb','properties.Lu',
-        'properties.Hf','properties.Ta','properties.Pb','properties.Th','properties.U',
-    #Characterization attributes - Geochemistry - Isotopes
-        'properties.143Nd_144Nd','properties.2SE_143Nd_144Nd','properties.87Sr_86Sr','properties.2SE_87Sr_86Sr',
-    #Characterization attributes - Geochemistry - Comparability
-        'properties.MeasurementRun',
-    #Metadata
-        'properties.Comments','properties.Flag','properties.FlagDescription','properties.MapFlag',
-    #Geometry
-        'geometry',
-    #id
-        'id']
-    BOOM_dataset = BOOM_dataset[sorter]
-
-    return BOOM_dataset
-
 def simbologia(volcano,event):
 
     simbología = pd.read_csv('../Scripts/Simbologia.csv', encoding = 'latin1', low_memory=False)
@@ -61,121 +24,7 @@ def simbologia(volcano,event):
     return coloR, markeR
 
 #--------------------- Functions for CheckNormalizations notebook --------------------------------------
-def renormalizing (BOOM_dataset):
-
-    BOOM_dataset_renormalized = BOOM_dataset.copy()
-    BOOM_dataset_renormalized['properties.MnO'] = BOOM_dataset_renormalized['properties.MnO'].replace('-',-1).astype(float)
-    BOOM_dataset_renormalized['properties.P2O5'] = BOOM_dataset_renormalized['properties.P2O5'].replace('-',-1).astype(float)
-    BOOM_dataset_renormalized['properties.Cl'] = BOOM_dataset_renormalized['properties.Cl'].replace('-',-1).astype(float)
-    BOOM_dataset_renormalized['properties.LOI'] = BOOM_dataset_renormalized['properties.LOI'].replace('-',-1).astype(float)
-    BOOM_dataset_renormalized['properties.FeO'] = BOOM_dataset_renormalized['properties.FeO'].replace(np.nan,-1)
-    BOOM_dataset_renormalized['properties.Fe2O3'] = BOOM_dataset_renormalized['properties.Fe2O3'].replace(np.nan,-1)
-    BOOM_dataset_renormalized['properties.FeOT'] = BOOM_dataset_renormalized['properties.FeOT'].replace(np.nan,-1)
-    BOOM_dataset_renormalized['properties.Fe2O3T'] = BOOM_dataset_renormalized['properties.Fe2O3T'].replace(np.nan,-1)
-
-    #Defining some variables which we will plot later to understand the variability of the re normalized data 
-    BOOM_dataset_renormalized['MnO + P2O5 + Cl'] = 'default'
-    BOOM_dataset_renormalized['Analytical Total without LOI'] = 'default'
-
-    for i in range(0,len(BOOM_dataset_renormalized['properties.Total'])):
-        
-        if (BOOM_dataset_renormalized['properties.FeOT'][i] != -1)&(BOOM_dataset_renormalized['properties.Fe2O3T'][i] == -1)&(BOOM_dataset_renormalized['properties.FeO'][i] == -1)&(BOOM_dataset_renormalized['properties.Fe2O3'][i] == -1):
-            sum_ = np.nansum([BOOM_dataset_renormalized['properties.SiO2'][i],
-                      BOOM_dataset_renormalized['properties.TiO2'][i],
-                      BOOM_dataset_renormalized['properties.Al2O3'][i],
-                      BOOM_dataset_renormalized['properties.FeOT'][i], #the samples tested have been analyzed by EMP, thus FeO corresponds to FeOT
-                      BOOM_dataset_renormalized['properties.MgO'][i],
-                      BOOM_dataset_renormalized['properties.CaO'][i],
-                      BOOM_dataset_renormalized['properties.Na2O'][i],
-                      BOOM_dataset_renormalized['properties.K2O'][i]])
-            
-            BOOM_dataset_renormalized.loc[i,'properties.SiO2_normalized'] = BOOM_dataset_renormalized['properties.SiO2'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.TiO2_normalized'] = BOOM_dataset_renormalized['properties.TiO2'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.Al2O3_normalized'] = BOOM_dataset_renormalized['properties.Al2O3'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.FeOT_normalized'] = BOOM_dataset_renormalized['properties.FeOT'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.MgO_normalized'] = BOOM_dataset_renormalized['properties.MgO'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.CaO_normalized'] = BOOM_dataset_renormalized['properties.CaO'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.Na2O_normalized'] = BOOM_dataset_renormalized['properties.Na2O'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.K2O_normalized'] = BOOM_dataset_renormalized['properties.K2O'][i]*100/sum_
-
-            BOOM_dataset_renormalized.loc[i,'Total_normalization'] = sum_
-                
-
-        if (BOOM_dataset_renormalized['properties.FeOT'][i] == -1)&(BOOM_dataset_renormalized['properties.Fe2O3T'][i] != -1)&(BOOM_dataset_renormalized['properties.FeO'][i] == -1)&(BOOM_dataset_renormalized['properties.Fe2O3'][i] == -1):
-            sum_ = np.nansum([BOOM_dataset_renormalized['properties.SiO2'][i],
-                      BOOM_dataset_renormalized['properties.TiO2'][i],
-                      BOOM_dataset_renormalized['properties.Al2O3'][i],
-                      BOOM_dataset_renormalized['properties.Fe2O3T'][i]*0.899, 
-                      BOOM_dataset_renormalized['properties.MgO'][i],
-                      BOOM_dataset_renormalized['properties.CaO'][i],
-                      BOOM_dataset_renormalized['properties.Na2O'][i],
-                      BOOM_dataset_renormalized['properties.K2O'][i]])
-
-            BOOM_dataset_renormalized.loc[i,'properties.SiO2_normalized'] = BOOM_dataset_renormalized['properties.SiO2'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.TiO2_normalized'] = BOOM_dataset_renormalized['properties.TiO2'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.Al2O3_normalized'] = BOOM_dataset_renormalized['properties.Al2O3'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.Fe2O3T_normalized'] = BOOM_dataset_renormalized['properties.Fe2O3T'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.MgO_normalized'] = BOOM_dataset_renormalized['properties.MgO'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.CaO_normalized'] = BOOM_dataset_renormalized['properties.CaO'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.Na2O_normalized'] = BOOM_dataset_renormalized['properties.Na2O'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.K2O_normalized'] = BOOM_dataset_renormalized['properties.K2O'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.Total_normalization'] = sum_
-                                      
-
-        if ((BOOM_dataset_renormalized['properties.FeO'][i] != -1)&(BOOM_dataset_renormalized['properties.Fe2O3'][i] != -1))&(BOOM_dataset_renormalized['properties.FeOT'][i] == -1):
-            sum_ = np.nansum([BOOM_dataset_renormalized['properties.SiO2'][i],
-                      BOOM_dataset_renormalized['properties.TiO2'][i],
-                      BOOM_dataset_renormalized['properties.Al2O3'][i],
-                      BOOM_dataset_renormalized['properties.FeO'][i], 
-                      BOOM_dataset_renormalized['properties.Fe2O3'][i]*0.899, 
-                      BOOM_dataset_renormalized['properties.MgO'][i],
-                      BOOM_dataset_renormalized['properties.CaO'][i],
-                      BOOM_dataset_renormalized['properties.Na2O'][i],
-                      BOOM_dataset_renormalized['properties.K2O'][i]]) 
-
-            BOOM_dataset_renormalized.loc[i,'properties.SiO2_normalized'] = BOOM_dataset_renormalized['properties.SiO2'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.TiO2_normalized'] = BOOM_dataset_renormalized['properties.TiO2'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.Al2O3_normalized'] = BOOM_dataset_renormalized['properties.Al2O3'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.FeO_normalized'] = BOOM_dataset_renormalized['properties.FeO'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.Fe2O3_normalized'] = BOOM_dataset_renormalized['properties.Fe2O3'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.MgO_normalized'] = BOOM_dataset_renormalized['properties.MgO'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.CaO_normalized'] = BOOM_dataset_renormalized['properties.CaO'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.Na2O_normalized'] = BOOM_dataset_renormalized['properties.Na2O'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.K2O_normalized'] = BOOM_dataset_renormalized['properties.K2O'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.Total_normalization'] = sum_                     
-
-        if ((BOOM_dataset_renormalized['properties.FeO'][i] != -1)&(BOOM_dataset_renormalized['properties.Fe2O3'][i] != -1))&(BOOM_dataset_renormalized['properties.FeOT'][i] != -1):
-            sum_ = np.nansum([BOOM_dataset_renormalized['properties.SiO2'][i],
-                      BOOM_dataset_renormalized['properties.TiO2'][i],
-                      BOOM_dataset_renormalized['properties.Al2O3'][i],
-                      BOOM_dataset_renormalized['properties.FeO'][i], 
-                      BOOM_dataset_renormalized['properties.Fe2O3'][i]*0.899, 
-                      BOOM_dataset_renormalized['properties.MgO'][i],
-                      BOOM_dataset_renormalized['properties.CaO'][i],
-                      BOOM_dataset_renormalized['properties.Na2O'][i],
-                      BOOM_dataset_renormalized['properties.K2O'][i]])
-                      
-            BOOM_dataset_renormalized.loc[i,'properties.SiO2_normalized'] = BOOM_dataset_renormalized['properties.SiO2'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.TiO2_normalized'] = BOOM_dataset_renormalized['properties.TiO2'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.Al2O3_normalized'] = BOOM_dataset_renormalized['properties.Al2O3'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.FeO_normalized'] = BOOM_dataset_renormalized['properties.FeO'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.FeOT_normalized'] = BOOM_dataset_renormalized['properties.FeOT'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.Fe2O3_normalized'] = BOOM_dataset_renormalized['properties.Fe2O3'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.MgO_normalized'] = BOOM_dataset_renormalized['properties.MgO'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.CaO_normalized'] = BOOM_dataset_renormalized['properties.CaO'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.Na2O_normalized'] = BOOM_dataset_renormalized['properties.Na2O'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.K2O_normalized'] = BOOM_dataset_renormalized['properties.K2O'][i]*100/sum_
-            BOOM_dataset_renormalized.loc[i,'properties.Total_normalization'] = sum_                     
-
-        BOOM_dataset_renormalized.loc[i,'MnO + P2O5 + Cl'] = np.nansum([BOOM_dataset_renormalized['properties.MnO'][i],
-                                                              BOOM_dataset_renormalized['properties.Cl'][i],
-                                                              BOOM_dataset_renormalized['properties.P2O5'][i]])
-        BOOM_dataset_renormalized.loc[i,'Analytical Total without LOI'] = np.nansum([BOOM_dataset_renormalized['properties.Total'][i],
-                                                                           - BOOM_dataset_renormalized['properties.LOI'][i]])
-     
-    return BOOM_dataset_renormalized
-
-def renormalizing_local (BOOM_dataset):
+def renormalizing(BOOM_dataset):
 
     BOOM_dataset_renormalized = BOOM_dataset.copy()
     BOOM_dataset_renormalized['MnO'] = BOOM_dataset_renormalized['MnO'].replace('-',-1).astype(float)
@@ -292,33 +141,35 @@ def renormalizing_local (BOOM_dataset):
 #--------------------- Functions for UncertaintyAndGeostandards notebook -------------------------------
 def estimating_accuracy(BOOM_geostandards,BOOM_geostandards_ref):
 # Estimating Accuracy: Measured Average/ Certified Value for each analyzed element for each secondary standard
-    MeasuredVsRef = pd.DataFrame(0, index = np.arange(len(BOOM_geostandards.StandardID)) ,columns = ['MeasurementRun','StandardID','SiO2','TiO2','Al2O3','MnO','MgO','Fe2O3T','FeOT','CaO','Na2O','K2O','P2O5','Cl','Rb','Sr','Y','Zr','Nb','Cs','Ba','La','Ce','Pr','Nd','Sm','Eu','Gd','Tb','Dy','Ho','Er','Tm','Yb','Lu','Hf','Ta','Pb','Th','U'])
-    elementos = ['SiO2','TiO2','Al2O3','MnO','MgO','Fe2O3T','FeOT','CaO','Na2O','K2O','P2O5','Cl','Rb','Sr','Y','Zr','Nb','Cs','Ba','La','Ce','Pr','Nd','Sm','Eu','Gd','Tb','Dy','Ho','Er','Tm','Yb','Lu','Hf','Ta','Pb','Th','U']
-    
-    # removing non numerical strings from data set 
-    BOOM_geostandards = BOOM_geostandards.replace(np.nan,-1) 
-    BOOM_geostandards = BOOM_geostandards.replace('<0.01',-1) 
-    BOOM_geostandards = BOOM_geostandards.replace('<0.002',-1)
-    BOOM_geostandards = BOOM_geostandards.replace('Over range',-1)
-    BOOM_geostandards = BOOM_geostandards.replace('<5',-1)
-    BOOM_geostandards = BOOM_geostandards.replace('> 10000',-1)
-    
-    # filtrating measurement runs where certified geostandards have been analyzed
-    BOOM_geostandards_certified = BOOM_geostandards[BOOM_geostandards.StandardID.isin(BOOM_geostandards_ref[BOOM_geostandards_ref.ErrorType.isin(["95%CL","SD"])].StandardID.unique().tolist())].copy()
+    MeasuredVsRef = pd.DataFrame(0, index = np.arange(len(BOOM_geostandards.Standard)) ,columns = ['MeasurementRun','Standard','SiO2','TiO2','Al2O3','MnO','MgO','Fe2O3T','FeOT','CaO','Na2O','K2O','P2O5','Cl','Rb','Sr','Y','Zr','Nb','Cs','Ba','La','Ce','Pr','Nd','Sm','Eu','Gd','Tb','Dy','Ho','Er','Tm','Yb','Lu','Hf','Ta','Pb','Th','U'])
+    elementos = ['SiO2','TiO2','Al2O3','MnO','MgO','FeOT','CaO','Na2O','K2O','P2O5','Cl','Rb','Sr','Y','Zr','Nb','Cs','Ba','La','Ce','Pr','Nd','Sm','Eu','Gd','Tb','Dy','Ho','Er','Tm','Yb','Lu','Hf','Ta','Pb','Th','U']
+    #'Fe2O3T',
+    BOOM_geostandards.replace(to_replace='n.a.', value=np.nan, inplace=True)
+    BOOM_geostandards.replace(to_replace='<0.01', value=np.nan, inplace=True)
+    BOOM_geostandards.replace(to_replace='<0.002', value=np.nan, inplace=True)
+    BOOM_geostandards.replace(to_replace='> 10000', value=np.nan, inplace=True)
+    BOOM_geostandards.replace(to_replace='<5', value=np.nan, inplace=True)
+    BOOM_geostandards.replace(to_replace='Over range', value=np.nan, inplace=True)
+    BOOM_geostandards.loc[:, 'SiO2':'RSD_U'] = BOOM_geostandards.loc[:, 'SiO2':'RSD_U'].astype('float')
+    MeasuredVsRef.loc[:, 'SiO2':'U'] = MeasuredVsRef.loc[:, 'SiO2':'U'].astype('float64')
 
-    for elemento in elementos:
-        MeasuredVsRef[elemento] = MeasuredVsRef[elemento].astype('float64')
+   
+    # filtering measurement runs where certified geostandards have been analyzed
+    BOOM_geostandards_certified = BOOM_geostandards[BOOM_geostandards.Standard.isin(BOOM_geostandards_ref[BOOM_geostandards_ref.ErrorType.isin(["95%CL","SD"])].StandardID.unique().tolist())].copy()
+    BOOM_geostandards_ref.replace(to_replace='<10', value=np.nan, inplace=True)
+    BOOM_geostandards_ref.loc[:, 'SiO2':'U'] = BOOM_geostandards_ref.loc[:, 'SiO2':'U'].astype('float')
+ 
     
     i=0
     for run in BOOM_geostandards_certified.MeasurementRun.unique():
         #print(run)
         temp = BOOM_geostandards_certified[BOOM_geostandards_certified.MeasurementRun==run]
-        for std in temp.StandardID.unique():
+        for std in temp.Standard.unique():
             #print(std)
             MeasuredVsRef.loc[i,'MeasurementRun'] = run
-            MeasuredVsRef.loc[i,'StandardID'] = std
+            MeasuredVsRef.loc[i,'Standard'] = std
         
-            temp1 = temp[temp.StandardID == std]
+            temp1 = temp[temp.Standard == std]
             index1 = temp1.first_valid_index()
             
             temp2 = BOOM_geostandards_ref[BOOM_geostandards_ref.StandardID == std]
@@ -328,21 +179,21 @@ def estimating_accuracy(BOOM_geostandards,BOOM_geostandards_ref):
                 
                 if (temp1[elemento][index1] != -1) & (temp2[elemento][index2] != -1):
                     #print(type(temp1[elemento][index1]))
-                    #print(type(temp2[elemento][index2]))                
+                    #print(type(temp2[elemento][index2]))   
+                    #print(temp2[elemento][index2])             
                     MeasuredVsRef.loc[i,elemento] = temp1[elemento][index1]/temp2[elemento][index2]
                     #print(type(Standards_Color[elemento][i]))
                     #print(temp1[elemento][index1]/temp2[elemento][index2])
             i=i+1            
              
-    MeasuredVsRef = MeasuredVsRef.replace(-1,np.nan)
     MeasuredVsRef = MeasuredVsRef.replace(0,np.nan)
-    MeasuredVsRef = MeasuredVsRef.dropna(subset = ['StandardID'],axis=0)
+    MeasuredVsRef = MeasuredVsRef.dropna(subset = ['Standard'],axis=0)
     MeasuredVsRef.loc[:,'MeasurementRun'] = MeasuredVsRef.loc[:,'MeasurementRun'].astype('str')
     
     return MeasuredVsRef
 
 def simbología_std(std):
-    simbología = pd.read_excel('../Data/Standards_Reference.xlsx')
+    simbología = pd.read_csv('../assets/Data/Standards_Reference.csv', encoding = 'UTF-8', low_memory =False)
     temp = simbología.loc[simbología['StandardID'] == std]
     coloR = temp.values[0,1]
     return coloR
@@ -359,11 +210,12 @@ def plot_accuracy_MeasurementRun(Accuracy_data,save=False,ymin=0.4,ymax=1.6):
     linea2.fill(0.95)
 
     for run in Accuracy_data.MeasurementRun.unique():
+        #print(run)
         plt.figure(figsize=(12,5))
         ax = plt.axes()        
         temp = Accuracy_data[Accuracy_data.MeasurementRun==run]
-        for std in temp.StandardID.unique():
-            temp2 = temp[temp.StandardID == std]
+        for std in temp.Standard.unique():
+            temp2 = temp[temp.Standard == std]
             temp2 = temp2.reset_index(drop=True)
             index2 = temp2.first_valid_index()
             #print(index2)
@@ -393,12 +245,12 @@ def plot_accuracy_BOOM(Accuracy_data,save=False,ymin=0.4,ymax=1.6):
     linea1.fill(1.05)
     linea2 = np.empty(len(elementos))
     linea2.fill(0.95)
-    Accuracy_data = Accuracy_data.sort_values(by=['StandardID'])
+    Accuracy_data = Accuracy_data.sort_values(by=['Standard'])
     plt.figure(figsize=(12,5))
     ax = plt.axes()        
 
-    for std in Accuracy_data.StandardID.unique():
-        temp = Accuracy_data[Accuracy_data.StandardID==std]
+    for std in Accuracy_data.Standard.unique():
+        temp = Accuracy_data[Accuracy_data.Standard==std]
         #print(std)
         #print(len(temp))
         Color = simbología_std(std)
@@ -445,8 +297,8 @@ def plot_RSD_MeasurementRun(BOOM_geostandards,save=False,ymin=0,ymax=50):
         plt.figure(figsize=(12,5))
         ax = plt.axes()
         temp = BOOM_geostandards[BOOM_geostandards.MeasurementRun==run]
-        for std in temp.StandardID.unique():
-            temp2 = temp[temp.StandardID == std]
+        for std in temp.Standard.unique():
+            temp2 = temp[temp.Standard == std]
             temp2 = temp2.reset_index(drop=True)
             index2 = temp2.first_valid_index()
             Color = simbología_std(std)
@@ -483,12 +335,12 @@ def plot_RSD_BOOM(BOOM_geostandards,save=False,ymin=0,ymax=50):
     linea1.fill(5)
     linea2 = np.empty(len(elements_RSD))
     linea2.fill(10)
-    BOOM_geostandards = BOOM_geostandards.sort_values(by=['StandardID'])
+    BOOM_geostandards = BOOM_geostandards.sort_values(by=['Standard'])
     plt.figure(figsize=(12,5)) 
-    ax = plt.axes()        
+    ax = plt.axes()
 
-    for std in BOOM_geostandards.StandardID.unique():
-        temp = BOOM_geostandards[BOOM_geostandards.StandardID==std]
+    for std in BOOM_geostandards.Standard.unique():
+        temp = BOOM_geostandards[BOOM_geostandards.Standard==std]
         #print(std)
         #print(len(temp))
         Color = simbología_std(std)
@@ -602,41 +454,6 @@ def plot_geochemistry(BOOM_geodf, unknown, element1, element2):
     volcanoes_by_latitude = volcanoes_by_latitude.sort_values(by='Latitud',ascending=False)
 
     #defininf a new dataset including the unknown sample and the known samples
-    df_correlation = BOOM_geodf[(BOOM_geodf['properties.Volcano']!='Unknown')]
-    temp = df_correlation.dropna(axis = 'rows',subset=(['properties.SiO2']))
-    temp = pd.concat([temp,unknown]) 
-    temp['properties.Volcano'] = pd.Categorical(temp['properties.Volcano'],
-                                                   categories=volcanoes_by_latitude.Volcan,
-                                                  ordered = True)
-    temp.sort_values('properties.Volcano', inplace=True)
-
-    # plot
-    fig = px.scatter(temp, element1, element2 , color = 'properties.Volcano',
-                  color_discrete_map = colores(temp['properties.Volcano'],type="volcano"), 
-                  hover_data = ['properties.SampleID','properties.SampleObservationID',
-                                'properties.Volcano','properties.Event','properties.Authors',
-                                'properties.MeasuredMaterial','properties.Flag'],
-                  labels = volcanoes_by_latitude['Volcan'],
-                  width=800, height=500)
-
-    fig.show()
-
-def plot_geochemistry_local(BOOM_geodf, unknown, element1, element2):
-    import warnings
-    warnings.simplefilter("ignore", UserWarning)
-    warnings.simplefilter("ignore", FutureWarning)
-    import plotly.express as px
-
-    unknown_row = {'Volcan': 'Unknown', 'Latitud': unknown.centroid.map(lambda p: p.y).unique()[0]}
-    
-    # the following is done to sort the volcanoes by latitude in the legend, together with the unnown sample, that way is easier to compare
-    #  the unknown smaples with nearby volcanic centers.  
-    volcanoes_by_latitude = pd.read_excel("../Scripts/VolcanesChile.xlsx")
-    volcanoes_by_latitude = volcanoes_by_latitude[(volcanoes_by_latitude.Activity!='Off')&(volcanoes_by_latitude.Latitud<-38.68)][['Volcan','Latitud']]
-    volcanoes_by_latitude = volcanoes_by_latitude.append(unknown_row, ignore_index=True) 
-    volcanoes_by_latitude = volcanoes_by_latitude.sort_values(by='Latitud',ascending=False)
-
-    #defininf a new dataset including the unknown sample and the known samples
     df_correlation = BOOM_geodf[(BOOM_geodf['Volcano']!='Unknown')]
     temp = df_correlation.dropna(axis = 'rows',subset=(['SiO2']))
     temp = pd.concat([temp,unknown]) 
@@ -669,36 +486,6 @@ def plot_age(BOOM_geodf, unknown):
     volcanoes_by_latitude = volcanoes_by_latitude.append(unknown_row, ignore_index=True) 
     volcanoes_by_latitude = volcanoes_by_latitude.sort_values(by='Latitud',ascending=False)
 
-    df_correlation = BOOM_geodf[(BOOM_geodf['properties.Volcano']!='Unknown')]
-    temp = df_correlation.append(unknown)    
-    temp['properties.Volcano'] = pd.Categorical(temp['properties.Volcano'],
-                                                   categories=volcanoes_by_latitude.Volcan,
-                                                  ordered = True)
-    temp.sort_values('properties.Volcano', inplace=True)
-
-    fig = px.violin(temp, y="properties.14C_Age", x = 'properties.Volcano',
-               color="properties.Event", color_discrete_map = colores(temp['properties.Event'],"event"), 
-               violinmode ='overlay', box =True, points = 'all',
-                #violinmode='overlay', # draw violins on top of each other
-                # default violinmode is 'group' as in example above
-                hover_data=['properties.Event','properties.SampleID','properties.MeasuredMaterial','properties.StratigraphicPosition'])
-    
-    fig.update_yaxes(autorange="reversed");fig.update_xaxes(categoryorder='array',categoryarray=volcanoes_by_latitude['Volcan'])
-    fig.show()
-
-def plot_age_local(BOOM_geodf, unknown):
-
-    import warnings
-    warnings.simplefilter("ignore", UserWarning)
-    warnings.simplefilter("ignore", FutureWarning)
-    import plotly.express as px
-    unknown_row = {'Volcan': 'Unknown', 'Latitud': unknown.centroid.map(lambda p: p.y).unique()[0]}
-    
-    volcanoes_by_latitude = pd.read_excel("../Scripts/VolcanesChile.xlsx")
-    volcanoes_by_latitude = volcanoes_by_latitude[(volcanoes_by_latitude.Activity!='Off')&(volcanoes_by_latitude.Latitud<-38.68)][['Volcan','Latitud']]
-    volcanoes_by_latitude = volcanoes_by_latitude.append(unknown_row, ignore_index=True) 
-    volcanoes_by_latitude = volcanoes_by_latitude.sort_values(by='Latitud',ascending=False)
-
     df_correlation = BOOM_geodf[(BOOM_geodf['Volcano']!='Unknown')]
     temp = df_correlation.append(unknown)    
     temp['Volcano'] = pd.Categorical(temp['Volcano'],
@@ -717,6 +504,7 @@ def plot_age_local(BOOM_geodf, unknown):
     fig.show()
 
 def unknown_info(BOOM_unknown_volcano,maxlines):
+
     counter = 0
 
     for section in BOOM_unknown_volcano['properties.SubSectionID'].unique():
@@ -746,3 +534,247 @@ def unknown_info(BOOM_unknown_volcano,maxlines):
             break
         
         counter=counter+1
+
+#----------------------------- Fonctions for Machine Learning notebook
+def preprocessing(df):
+
+    # 1. First of all, we drop rows corresponding to samples not analyzed for geochemistry, as well as outliers, 
+    # samples for which the volcanic source is uncertain, and samples with Analytical Totals lower than 94 wt.%, 
+    # as they might correspond to altered samples.
+
+    is_register = df.TypeOfRegister.isin(['Pyroclastic material','Effusive material'])
+    isnot_outlier = df.Flag.str.contains('Outlier', na=False, case=False) == False
+    isnot_VolcanicSourceIssue = df.Flag.str.contains(
+    'VolcanicSource_Issue', na=False, case=False) == False
+    df.SiO2 = df.SiO2.replace(np.nan, -1)
+    isnot_altered = ((df.Total > 95) & (df.SiO2 != -1)) | (df.SiO2 == -1)  
+    df.SiO2 = df.SiO2.replace(-1,np.nan)
+    df = df.loc[is_register & isnot_outlier & isnot_VolcanicSourceIssue & isnot_altered]
+    n, _ = df.shape
+    #print(f'There are {n} rows left.')
+
+    # 2. In second place, we will replace some of the values in the Dataset.
+    # 2.1 Replace element concentrations registered as "0" with "below detection limit" (bdl). 
+    # Because a value equal to zero is not possible to determine with the current analytical techniques, thus bdl is more accurate.
+
+    for elemento in ["SiO2","TiO2","Al2O3","FeO","Fe2O3",
+                 "MnO","MgO","CaO","Na2O","K2O","P2O5",
+                 "Cl",'Rb','Sr','Y','Zr','Nb',
+                 'Cs','Ba','La','Ce','Pr','Nd',
+                 'Sm','Eu','Gd','Tb','Dy','Ho',
+                 'Er','Tm','Yb','Lu','Hf','Ta',
+                 'Pb','Th','U']:
+        df[elemento] = df[elemento].replace(to_replace=0, value='bdl')
+
+    #2.2 Repace the various missing values placeholders by np.nan
+    df.replace(to_replace='n.a.', value=np.nan, inplace=True)
+    df.replace(to_replace='Not analyzed', value=np.nan, inplace=True)
+    df.replace(to_replace='-', value=np.nan, inplace=True)
+    df.replace(to_replace='Not determined', value=np.nan, inplace=True)
+    df.replace(to_replace='n.d', value=np.nan, inplace=True)
+    df.replace(to_replace='n.d.', value=np.nan, inplace=True)
+    df.replace(to_replace='<0.01', value=np.nan, inplace=True)
+    df.replace(to_replace='<0.1', value=np.nan, inplace=True)
+    df.replace(to_replace='<1', value=np.nan, inplace=True)
+    df.replace(to_replace='<5', value=np.nan, inplace=True)
+    df.replace(to_replace='<6', value=np.nan, inplace=True)
+    df.replace(to_replace='<10', value=np.nan, inplace=True)
+    df.replace(to_replace='Over range', value=np.nan, inplace=True)
+    df.replace(to_replace='bdl', value=np.nan, inplace=True)
+
+    #2.3 Make sure major and trace elements correspond to numbers and not strings.
+    df.loc[:, 'Rb':'U'] = df.loc[:, 'Rb':'U'].astype('float')
+    df.loc[:, 'SiO2_normalized':'K2O_normalized'] = df.loc[:, 'SiO2_normalized':'K2O_normalized'].astype('float')
+
+    #3. Because Fe can be analyzed in different states (FeO, Fe2O3, FeOT, Fe2O3T), the columns describing Fe have many missing values 
+    # but which can be filled by transforming one form of Fe into another. Because most of the samples in the BOOM dataset have been 
+    # analyzed by Electron Microscopy which analyzes Fe as FeOT, we calculate FeOT for all the samples and drop the other rows (Fe2O3, Fe2O3T, FeO) 
+    # as they are redundant.
+
+    #case 1: Fe is presented as Fe2O3 and FeO in the original publication
+    ind = (~df.SiO2_normalized.isna() &
+       df.FeOT_normalized.isna() &
+       ~df.FeO_normalized.isna() &
+       ~df.Fe2O3_normalized.isna()&
+       df.Fe2O3T_normalized.isna()
+      )
+    df.loc[ind,'FeOT_normalized'] = df.FeO_normalized.loc[ind]+df.Fe2O3_normalized.loc[ind]*0.899
+
+    #case 2: Fe is presented as Fe2O3T in the original publication
+    ind = (~df.SiO2_normalized.isna()&
+       df.FeOT_normalized.isna()&
+       df.FeO_normalized.isna()&
+       ~df.Fe2O3T_normalized.isna()&
+       df.Fe2O3_normalized.isna()
+      )
+
+    df.loc[ind,'FeOT_normalized'] = df.Fe2O3T_normalized.loc[ind]*0.899
+
+    df.drop(['FeO_normalized','Fe2O3_normalized', 'Fe2O3T_normalized'], axis=1, inplace=True)
+
+    #4. When training the models, all sample observations corresponding to the same sample should either be in the train or test sets. 
+    # Thus, we will check if there is any volcanic center with information from only one sample ID.
+    co = pd.crosstab(df.Volcano, df.SampleID)
+    _, n_sampleID = co.shape
+    #print(f'There are {n_sampleID} unique samples IDs')
+    is_nonzero = co > 0
+    n_volcan_per_sampleID = is_nonzero.sum(axis=0)
+    unique, counts = np.unique(n_volcan_per_sampleID, return_counts=True)
+    ind_ids = np.where(is_nonzero.sum(axis=0) == 2)[0]
+    #print(f'There are {len(ind_ids)} sampleIDs which contain several observations from several volcanoes:')
+    #print([co.columns[ind_ids].values[i] for i in range(len(ind_ids))]) 
+
+    n_sampleID_per_volcan = is_nonzero.sum(axis=1)
+    ind_ids = np.where(n_sampleID_per_volcan == 1)[0]
+    #print(f'There is {len(ind_ids)} volcanic center whose observations all come from the same sample IDs:')
+    #print([co.index[i] for i in ind_ids])
+
+    df = df[df.Volcano != co.index[ind_ids[0]]]
+
+    #print(f'There are {len(df)} observations left.')
+
+    #5. We will drop the volcanoes with less than 10 observations.
+    Cay = df.Volcano=='Cay'
+    CordonC = df.Volcano=='Cordón Cabrera'
+    Corcovado =  df.Volcano=='Corcovado'
+    Yanteles = df.Volcano=='Yanteles'
+
+    df = df.loc[~Cay & ~CordonC & ~Corcovado & ~Yanteles]
+    n, p = df.shape
+    #print(f'The dataset now has {n} samples.')
+    return df
+
+class GridSearchCV_with_groups(BaseEstimator, ClassifierMixin):
+
+    def __init__(self, estimator, param_grid, cv_test_size, cv_n_splits,
+                 n_jobs=None):
+        self.estimator = estimator
+        self.param_grid = param_grid
+        self.cv_test_size = cv_test_size
+        self.cv_n_splits = cv_n_splits
+        self.n_jobs = n_jobs
+
+    def fit(self, X, y, groups):
+
+        if isinstance(X, pd.DataFrame):
+            X = X.to_numpy()
+        if isinstance(y, pd.core.series.Series):
+            y = y.to_numpy()
+
+        keys = self.param_grid.keys()
+        values = self.param_grid.values()
+        combinations = [
+            dict(zip(keys, combination)) for combination in product(*values)]
+
+        gss = GroupShuffleSplit(
+            test_size=self.cv_test_size, n_splits=self.cv_n_splits)
+        
+        scores = np.empty((self.cv_n_splits, len(combinations)))
+
+        for i, (train, test) in enumerate(gss.split(X, groups=groups)):
+            X_train_in = X[train]
+            X_test_in = X[test]
+            y_train_in = y[train]
+            y_test_in = y[test]
+
+            for j, comb in enumerate(combinations):
+                self.estimator.set_params(**comb)
+                self.estimator.fit(X_train_in, y_train_in)
+                scores[i, j] = self.estimator.score(X_test_in, y_test_in)
+
+        median_score = np.median(scores, axis=0)
+        best_comb = np.argmax(median_score)
+
+        self.scores_ = scores
+        self.params_ = combinations
+        self.best_params_ = combinations[best_comb]
+        self.best_score_ = median_score[best_comb]
+
+        # Refit on the whole dataset with the best paraps
+        self.best_estimator_ = clone(
+            self.estimator.set_params(**self.best_params_))
+
+        self.best_estimator_.fit(X, y)
+
+    def predict(self, X):
+        return self.best_estimator_.predict(X)
+
+    def score(self, X, y):
+        return self.best_estimator_.score(X, y)
+
+def plot_scatterplots(X_volcanoes, yv, X_test_out, yv_test_out, A, B, est, pred,
+                      volcano_list, name= 'default', target_type='volcano', save='yes'):
+
+    ind_wrong = pred != yv_test_out
+
+    X_test_imp = Pipeline(est.best_estimator_.steps[:-2]).fit_transform(X_test_out)
+    X_test_imp = pd.DataFrame(X_test_imp, columns=X_test_out.columns)
+    yv_test_names = volcano_list[yv_test_out]
+    
+    # Plot Original data (how are missing values treated?)
+    # Only fully observed points plotted?
+    fig, axes = plt.subplots(1, 3, figsize=(15, 4), sharex=True, sharey=True)
+    A = 'SiO2_normalized'
+    B = 'K2O_normalized'
+    yv_names = volcano_list[yv]
+    sns.scatterplot(
+        x=X_test_out.loc[:, A], y=X_test_out.loc[:, B],
+        hue=yv_test_names, alpha=0.7,
+        palette=colores(yv_test_names, target_type), ax=axes[0]
+    )
+    axes[0].set_title("Original data")
+    axes[0].legend(loc='center left', bbox_to_anchor=(0, -0.65), ncol=2)
+
+    # Plot Imputed data with ground truth labels
+    
+    sns.scatterplot(
+        x=X_test_imp.loc[:, A], y=X_test_imp.loc[:, B],
+        hue=yv_test_names, alpha=0.7,
+        palette=colores(yv_test_names, target_type), ax=axes[1])
+    sns.scatterplot(
+        x=X_test_imp.loc[ind_wrong, A],
+        y=X_test_imp.loc[ind_wrong, B],
+        ax=axes[1], marker='x', color='k', s=30
+    )
+    axes[1].set_title(
+        "Imputed and normalized test data \n with ground truth labels")
+    axes[1].legend(loc='center left', bbox_to_anchor=(0, -0.65), ncol=2)
+
+    # Plot Imputed data with predicted labels
+    yv_pred_names = volcano_list[pred]
+    sns.scatterplot(
+        x=X_test_imp.loc[:, A],  y=X_test_imp.loc[:, B],
+        hue=yv_pred_names, alpha=0.7,
+        palette=colores(yv_pred_names, target_type), ax=axes[2]
+    )
+    sns.scatterplot(
+        x=X_test_imp.loc[ind_wrong, A],
+        y=X_test_imp.loc[ind_wrong, B],
+        ax=axes[2], marker='x', color='k', s=30
+    )
+    axes[2].set_title(
+        "Imputed and normalized test data \n with predicted labels")
+    axes[2].legend(loc='center left', bbox_to_anchor=(0, -0.65), ncol=2)
+
+    if save == 'yes':
+        plt.savefig('../Plots/'+name + A+'vs'+B+'.png',dpi = 300,bbox_inches='tight',facecolor='w')
+
+def plot_confusion_matrix(yv_test_names, yv_pred_names, labels,name='default',save='yes'):
+    
+    fig = plt.figure(figsize=(8, 8))
+    ax = fig.add_subplot(111)
+    cm = confusion_matrix(yv_test_names, yv_pred_names, labels=labels, normalize='true')
+    cm = (cm.T/cm.sum(axis=1)).T
+    plt.imshow(cm, cmap='viridis')
+    plt.colorbar()
+    n_volcanoes = len(labels)
+    ax.set_xticks(np.arange(n_volcanoes))
+    ax.set_xticklabels(labels)
+    ax.set_yticks(np.arange(n_volcanoes))
+    ax.set_yticklabels(labels)
+    plt.ylabel('True label', fontsize=14)
+    plt.xlabel('Predicted label', fontsize=14)
+    plt.xticks(rotation=90)
+    fig.show()
+    if save == 'yes':
+        plt.savefig('../Plots/'+name+'.png',dpi = 300,bbox_inches='tight',facecolor='w')
