@@ -21,7 +21,7 @@ $ pip install -r requirements.txt
 ```
 
 More details about how to create virtual environments in python are available
-[here](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment)
+[here](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment).
 
 ### Conda Environment
 
@@ -29,7 +29,8 @@ If you are a conda/mamba user
 
 ```
 $ conda env create -f environment.yml
+$ conda activate boomenv
 ```
 
 More details about how to create conda virtual environments are available
-[here](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)
+[here](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html).
