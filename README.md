@@ -4,7 +4,7 @@ This repository contains jupyter notebooks aimed to process the information in t
 
 - **UncertaintyAndStandards**.ipynb: Estimate the precision and accuracy of the geochemical composition analyses contained in the BOOM dataset.
 - **CheckNormalizations**.ipynb: Establish if the major element composition of samples in which different major elements have been analyzed (e.g. samples where MnO, Cl and/or P2O5 have not been analyzed, versus samples that have) are comparable or not.
-- **MachineLearning**.ipynb and BOOMDataset_Preprocessing.ipynb: Evaluating the use of machine learning classification algortihms as a way of identifying the volcanic source of "unclassified" tephra deposits.
+- **MachineLearning**.ipynb and **BOOMDataset_Preprocessing**.ipynb: Evaluating the use of machine learning classification algortihms as a way of identifying the volcanic source of "unclassified" tephra deposits.
 
 The notebooks and the dataset are fully described in Martínez Fontaine et al. *in prep* (linked when is published).
 
