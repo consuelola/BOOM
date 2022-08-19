@@ -123,8 +123,8 @@ for comps in model_components:
     est = GridSearchCV_with_groups(
         clf, grid, cv_test_size=0.2, cv_n_splits=5, n_jobs=5)
 
-    gss = GroupShuffleSplit(test_size=0.2, n_splits=5, random_state=0)
-    # gss = StratifiedGroupKFold(n_splits=5, random_state=0)
+    # gss = GroupShuffleSplit(test_size=0.2, n_splits=5, random_state=0)
+    gss = StratifiedGroupKFold(n_splits=5, shuffle=True, random_state=0)
 
     cv = cross_validate(est,
                         X_volcanoes,
@@ -155,7 +155,7 @@ for comps in model_components:
 
     # recover the first outer cross-validation split
     train_out, test_out = next(
-        gss.split(X_volcanoes, groups=SampleID)
+        gss.split(X_volcanoes, y=y, groups=SampleID)
     )
     # recover the fitted predictor for this split
     est = results[clf_name]['estimator'][0].best_estimator_

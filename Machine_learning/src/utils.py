@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from itertools import product
-from sklearn.model_selection import GroupShuffleSplit
+from sklearn.model_selection import GroupShuffleSplit,  StratifiedGroupKFold
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
 from sklearn.base import BaseEstimator, ClassifierMixin, clone
@@ -166,15 +166,16 @@ class GridSearchCV_with_groups(BaseEstimator, ClassifierMixin):
         self.params_ = [
             dict(zip(keys, combination)) for combination in product(*values)]
 
-        gss = GroupShuffleSplit(
-            test_size=self.cv_test_size, n_splits=self.cv_n_splits)
+        # gss = GroupShuffleSplit(
+        #     test_size=self.cv_test_size, n_splits=self.cv_n_splits)
+        gss = StratifiedGroupKFold(n_splits=self.cv_n_splits, shuffle=True)
 
         out = Parallel(n_jobs=self.n_jobs)(
             delayed(self.fit_one)(
                 X[train], y[train], X[test], y[test], comb, id_split, id_comb)
             for id_comb, comb in enumerate(self.params_)
             for id_split, (train, test) in enumerate(
-                gss.split(X, groups=groups)
+                gss.split(X, y=y, groups=groups)
                 )
             )
 
