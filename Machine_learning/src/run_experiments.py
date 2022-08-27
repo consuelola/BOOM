@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 import requests
+import pathlib
+
 from itertools import product
 from io import StringIO
 from sklearn.base import clone
@@ -22,6 +24,14 @@ from utils import get_models
 data_type = 'majors_only'
 # data_type = 'traces_only'
 # data_type = 'majors_and_traces'
+
+# Define the root of the output result directory
+result_dir =  "../results/"
+figure_dir =  "../figures/"
+
+# Create the directory tree
+pathlib.Path(f"{result_dir}/{data_type}").mkdir(parents=True, exist_ok=True)
+pathlib.Path(f"{figure_dir}/{data_type}").mkdir(parents=True, exist_ok=True)
 
 # Download the dataset from the ESPRI server as .csv
 url = "https://data.ipsl.fr/repository/TephraDatabase/TephraDataBase.csv"
@@ -146,7 +156,7 @@ for measure in measures:
     res = pd.DataFrame([results[c][measure] for c in model_names])
     res = res.transpose()
     res.columns = model_names
-    res.to_csv(f'../results/{data_type}/{measure}.csv')
+    res.to_csv(f'{result_dir}/{data_type}/{measure}.csv')
 
 
 # Visualize results for the first fold
@@ -213,6 +223,6 @@ for comps in model_components:
     ax.set_title("Permutation Importances (test set)")
     fig.tight_layout()
     plt.savefig(
-        f'../figures/{data_type}/permutation_importance_{clf_name}.png',
+        f'{figure_dir}/{data_type}/permutation_importance_{clf_name}.png',
         dpi=300, bbox_inches='tight')
     plt.close()
