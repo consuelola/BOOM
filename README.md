@@ -9,3 +9,28 @@ This repository contains jupyter notebooks aimed to process the information in t
 The notebooks and the dataset are fully described in Martínez Fontaine et al. *in prep* (linked when is published).
 
 Additional exploration of the BOOM dataset, as well as downloading subsets of it, can be done with the BOOM explorer (link here when is up).
+
+## How to run the notebooks locally
+
+### Python Virtual Environment
+
+```bash
+$ python3 -m venv ~/boomenv
+$ source ~/boomenv/bin/activate
+$ pip install -r requirements.txt
+```
+
+More details about how to create virtual environments in python are available
+[here](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment).
+
+### Conda Environment
+
+If you are a conda/mamba user
+
+```
+$ conda env create -f environment.yml
+$ conda activate boomenv
+```
+
+More details about how to create conda virtual environments are available
+[here](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html).
