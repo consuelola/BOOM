@@ -3,13 +3,13 @@
 # Job description
 #PBS -N submitjob
 # Resources used : one core on one node
-#PBS -l nodes=1:ppn=1
+#PBS -l nodes=1:ppn=5
 # 10 hour elapsed time
 #PBS -l walltime=10:00
-# give 2gb of memory for your job
+# give 8gb of memory for your job
 # memory is for the all process in a job not per process
 # vmem must be >= mem .
-#PBS -l vmem=2gb,mem=2gb
+#PBS -l vmem=8gb,mem=8gb
 # Standard error & standard output are merged in example.out
 #PBS -j oe
 #PBS -o submitjob.out
