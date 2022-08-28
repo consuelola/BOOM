@@ -23,7 +23,7 @@ from utils import get_models
 # Choose the data to be used for learning.
 data_type = 'majors_only'
 # data_type = 'traces_only'
-# data_type = 'majors_and_traces'
+#data_type = 'majors_and_traces'
 
 # Define the root of the output result directory
 result_dir =  "../results/"
@@ -179,17 +179,17 @@ for comps in model_components:
     # have an idea of which samples are badly classified
     plot_scatterplots(X_test_out, y_test_out,
                       'SiO2_normalized', 'K2O_normalized',
-                      est, pred, volcano_list, name=f'{data_type}/{clf_name}',
+                      est, pred, volcano_list, dir=figure_dir, name=f'{data_type}/{clf_name}',
                       save=True)
     if 'traces' in data_type:
         plot_scatterplots(X_test_out, y_test_out, 'SiO2_normalized', 'La',
-                          est, pred, volcano_list,
+                          est, pred, volcano_list, dir=figure_dir,
                           name=f'{data_type}/{clf_name}', save=True)
         plot_scatterplots(X_test_out, y_test_out, 'Rb', 'Sr',
-                          est, pred, volcano_list,
+                          est, pred, volcano_list, dir=figure_dir,
                           name=f'{data_type}/{clf_name}', save=True)
         plot_scatterplots(X_test_out, y_test_out, 'Cs', 'La',
-                          est, pred, volcano_list,
+                          est, pred, volcano_list, dir=figure_dir,
                           name=f'{data_type}/{clf_name}', save=True)
 
     # plot the confusion matrix
@@ -207,7 +207,7 @@ for comps in model_components:
     y_pred_names = volcano_list[pred]
     plot_confusion_matrix(
         y_test_names, y_pred_names, labels=volcanoes_by_latitude,
-        name=f'{data_type}/ConfusionMatrix_{clf_name}', save=True
+        name=f'{data_type}/ConfusionMatrix_{clf_name}', dir=figure_dir, save=True
     )
 
     # plot permutation importance

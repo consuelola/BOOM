@@ -209,8 +209,8 @@ class GridSearchCV_with_groups(BaseEstimator, ClassifierMixin):
 
 
 def plot_scatterplots(X_test_out, y_test_out, chem_A, chem_B, est, pred,
-                      volcano_list, name='default', target_type='volcano',
-                      save=False):
+                      volcano_list, dir='../figures/', name='default',
+                      target_type='volcano', save=False):
 
     ind_wrong = pred != y_test_out
     if len(est.steps) == 3:
@@ -267,14 +267,14 @@ def plot_scatterplots(X_test_out, y_test_out, chem_A, chem_B, est, pred,
 
     if save:
         plt.savefig(
-            '../figures/' + name + '_' + chem_A + 'vs' + chem_B + '.png',
+            dir + name + '_' + chem_A + 'vs' + chem_B + '.png',
             dpi=300, bbox_inches='tight', facecolor='w')
     else:
         plt.show()
 
 
 def plot_confusion_matrix(y_test_names, y_pred_names, labels, name='default',
-                          save=False):
+                          dir='../figures/', save=False):
 
     fig = plt.figure(figsize=(8, 8))
     ax = fig.add_subplot(111)
@@ -293,7 +293,7 @@ def plot_confusion_matrix(y_test_names, y_pred_names, labels, name='default',
     plt.xlabel('Predicted label', fontsize=14)
     plt.xticks(rotation=90)
     if save:
-        plt.savefig('../figures/'+name+'.png', dpi=300, bbox_inches='tight',
+        plt.savefig(dir+name+'.png', dpi=300, bbox_inches='tight',
                     facecolor='w')
     else:
         plt.show()
@@ -402,7 +402,7 @@ def get_models():
 
 def simbologia(volcano, event):
 
-    simbología = pd.read_csv('../../Scripts/Simbologia.csv',
+    simbología = pd.read_csv('/home/cmarmo/software/BOOM-master/Scripts/Simbologia.csv',
                              encoding='latin1', low_memory=False)
     Event = simbología.loc[simbología['Volcano'] == volcano]
     Event = Event.loc[Event['Event'] == event]
@@ -419,7 +419,7 @@ def colores(Y, type):
             Dpal[volcan] = color
 
     if type == 'event':
-        simbología = pd.read_csv('../../Scripts/Simbologia.csv',
+        simbología = pd.read_csv('/home/cmarmo/software/BOOM-master/Scripts/Simbologia.csv',
                                  encoding='latin1', low_memory=False)
         for event in np.unique(Y):
             # print(event)
