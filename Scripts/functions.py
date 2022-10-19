@@ -3,6 +3,7 @@ from re import X
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.patches as ptc
 import warnings
 warnings.simplefilter("ignore")
 
@@ -541,3 +542,73 @@ def unknown_info(BOOM_unknown_volcano,maxlines):
             break
         
         counter=counter+1
+
+########################################
+# Plotting some results from ML analysis
+
+def compare_accuracies(mo_file, mt_file, mo_bal_file, mt_bal_file, pdf_output=False):
+
+    mo_accuracies_df = pd.read_csv(mo_file)
+    mo_accuracies_df.drop(columns=['Unnamed: 0'],inplace=True)
+    mt_accuracies_df = pd.read_csv(mt_file)
+    mt_accuracies_df.drop(columns=['Unnamed: 0'],inplace=True)
+    mo_bal_accuracies_df = pd.read_csv(mo_bal_file)
+    mo_bal_accuracies_df.drop(columns=['Unnamed: 0'],inplace=True)
+    mt_bal_accuracies_df = pd.read_csv(mt_bal_file)
+    mt_bal_accuracies_df.drop(columns=['Unnamed: 0'],inplace=True)
+
+    x = mo_accuracies_df.mean(axis=0)
+    std_x = mo_accuracies_df.std(axis=0)
+    max_err_x = mo_accuracies_df.max(axis=0) - mo_accuracies_df.min(axis=0)
+
+    y = mt_accuracies_df[mo_accuracies_df.columns].mean(axis=0)
+    std_y = mt_accuracies_df[mo_accuracies_df.columns].std(axis=0)
+    max_err_y = mt_accuracies_df[mo_accuracies_df.columns].max(axis=0) - \
+                mt_accuracies_df[mo_accuracies_df.columns].min(axis=0)
+
+    x_bal = mo_bal_accuracies_df.mean(axis=0)
+    std_x_bal = mo_bal_accuracies_df.std(axis=0)
+    max_err_x_bal = mo_bal_accuracies_df.max(axis=0) - mo_bal_accuracies_df.min(axis=0)
+
+    y_bal = mt_bal_accuracies_df[mo_bal_accuracies_df.columns].mean(axis=0)
+    std_y_bal = mt_bal_accuracies_df[mo_bal_accuracies_df.columns].std(axis=0)
+    max_err_y_bal = mt_bal_accuracies_df[mo_bal_accuracies_df.columns].max(axis=0) - \
+                    mt_bal_accuracies_df[mo_bal_accuracies_df.columns].min(axis=0)
+
+    fig1, ax = plt.subplots(ncols=2,sharey=True)
+
+    colors = ['cyan', 'purple', 'orange', 'blue']
+    labels = ['KNN - mean imputer', 'Logistic Regression - mean imputer', 'Random Forest - mean imputer', 'Gradient Boosting']
+
+    ax[0].set_xlim(0.55, 0.95)
+    ax[0].set_ylim(0.55, 0.95)
+    ax[0].set_box_aspect(1)
+    ax[0].set_title("Accuracy")
+    ax[0].set_xlabel("majors only")
+    ax[0].set_ylabel("majors + traces")
+    ax[0].scatter(x, y, c=colors, s=50, zorder=3)
+    ax[0].errorbar(x,y,xerr=std_x,yerr=std_y,fmt='o',linewidth=2)
+    ax[0].errorbar(x,y,xerr=max_err_x,yerr=max_err_y,fmt='o',linewidth=0.5)
+
+    ax[1].set_xlim(0.55, 0.95)
+    ax[1].set_ylim(0.55, 0.95)
+    ax[1].set_box_aspect(1)
+    ax[1].set_title("Balanced Accuracy")
+    ax[1].set_xlabel("majors only")
+    ax[1].scatter(x_bal, y_bal, c=colors, s=50, zorder=3)
+    ax[1].errorbar(x_bal,y_bal,xerr=std_x_bal,yerr=std_y_bal,fmt='o',linewidth=2)
+    ax[1].errorbar(x_bal,y_bal,xerr=max_err_x_bal,yerr=max_err_y_bal,fmt='o',linewidth=0.5)
+
+    dots = []
+    for (color, label) in zip(colors,labels):
+        dot = ptc.Circle([], radius=2, color=color, label=label)
+        dots.append(dot)
+    legend = ax[1].legend(handles=dots, loc = (1.1,0.1), title="models")
+    ax[1].add_artist(legend)
+
+    if pdf_output:
+        plt.savefig('comparison_accuracy.pdf',
+                    dpi=300, bbox_inches='tight')
+        plt.close()
+    else:
+        plt.show()
