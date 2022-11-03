@@ -113,7 +113,7 @@ def get_clf_grid(comps):
     imp, mod = comps
     if imp is not None:
         clf = make_pipeline(
-            StandardScaler(), clone(imputations[imp]), clone(models[mod])
+            clone(imputations[imp]), StandardScaler(), clone(models[mod])
         )
         clf_name = '_'.join(comps)
     else:
