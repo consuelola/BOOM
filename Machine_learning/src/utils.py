@@ -168,7 +168,8 @@ class GridSearchCV_with_groups(BaseEstimator, ClassifierMixin):
 
         # gss = GroupShuffleSplit(
         #     test_size=self.cv_test_size, n_splits=self.cv_n_splits)
-        gss = StratifiedGroupKFold(n_splits=self.cv_n_splits, shuffle=True)
+        gss = StratifiedGroupKFold(
+            n_splits=self.cv_n_splits, shuffle=True, random_state=0)
 
         out = Parallel(n_jobs=self.n_jobs)(
             delayed(self.fit_one)(
@@ -355,7 +356,7 @@ def get_models():
 
     # Multinomial logistic regression
     lr = LogisticRegression(multi_class='multinomial', class_weight='balanced')
-    grid_lr = {'logisticregression__C': [1e-2, 1e-1, 1, 1e1, 1e2],
+    grid_lr = {'logisticregression__C': [1, 1e1, 1e2, 5e2],
                'logisticregression__solver': ['saga']}
 
     # Random Forest
@@ -370,8 +371,8 @@ def get_models():
     gb = HistGradientBoostingClassifier()
     grid_gb = {
         'histgradientboostingclassifier__learning_rate':
-            [1e-4, 1e-3, 1e-2, 1e-1],
-        'histgradientboostingclassifier__l2_regularization': [0, 1e-2, 1e-1],
+            [1e-2, 1e-1, 1],
+        'histgradientboostingclassifier__l2_regularization': [0, 1e-2, 1e-1, 1, 10],
         'histgradientboostingclassifier__max_depth': [None, 3]
         }
 
@@ -384,11 +385,13 @@ def get_models():
     knn_imp = KNNImputer(n_neighbors=15, weights='distance')
 
     # Iterative Imputer with Bayesian Ridge
-    br_imp = IterativeImputer(estimator=BayesianRidge(), min_value=0)
+    # br_imp = IterativeImputer(estimator=BayesianRidge(), min_value=0)
+    br_imp = IterativeImputer(estimator=BayesianRidge())
 
     # Iterative Imputer with Random Forest
-    est_rf = RandomForestRegressor()
-    rf_imp = IterativeImputer(estimator=est_rf, min_value=0)
+    est_rf = RandomForestRegressor(n_estimators=30)
+    # rf_imp = IterativeImputer(estimator=est_rf, min_value=0)
+    rf_imp = IterativeImputer(estimator=est_rf)
 
     # Define the imputation-model combinations to be tested
     # -----------------------------------------------------
@@ -402,7 +405,7 @@ def get_models():
 
 def simbologia(volcano, event):
 
-    simbología = pd.read_csv('/home/cmarmo/software/BOOM-master/Scripts/Simbologia.csv',
+    simbología = pd.read_csv('../../Scripts/Simbologia.csv',
                              encoding='latin1', low_memory=False)
     Event = simbología.loc[simbología['Volcano'] == volcano]
     Event = Event.loc[Event['Event'] == event]
@@ -419,7 +422,7 @@ def colores(Y, type):
             Dpal[volcan] = color
 
     if type == 'event':
-        simbología = pd.read_csv('/home/cmarmo/software/BOOM-master/Scripts/Simbologia.csv',
+        simbología = pd.read_csv('../../Scripts/Simbologia.csv',
                                  encoding='latin1', low_memory=False)
         for event in np.unique(Y):
             # print(event)

@@ -6,7 +6,7 @@ geochem = 'majors_and_traces'
 file_accuracies = f'../results/{geochem}/test_accuracy.csv'
 acc = pd.read_csv(file_accuracies, index_col=0)
 
-# Convert from wide to lon format
+# Convert from wide to long format
 value_vars = list(acc.columns)
 acc['repeat'] = acc.index
 acc = pd.melt(acc, id_vars='repeat', value_vars=value_vars, var_name='method',

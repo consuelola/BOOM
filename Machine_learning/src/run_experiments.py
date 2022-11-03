@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import requests
 import pathlib
+import pickle
 
 from itertools import product
 from io import StringIO
@@ -12,7 +13,7 @@ from sklearn.model_selection import cross_validate, GroupShuffleSplit,\
     StratifiedGroupKFold
 from sklearn.inspection import permutation_importance
 import matplotlib.pyplot as plt
-import missingno as msno
+# import missingno as msno
 from utils import preprocessing
 from utils import GridSearchCV_with_groups
 from utils import plot_scatterplots
@@ -21,13 +22,13 @@ from utils import get_design_matrix
 from utils import get_models
 
 # Choose the data to be used for learning.
-data_type = 'majors_only'
+# data_type = 'majors_only'
 # data_type = 'traces_only'
-#data_type = 'majors_and_traces'
+data_type = 'majors_and_traces'
 
 # Define the root of the output result directory
-result_dir =  "../results/"
-figure_dir =  "../figures/"
+result_dir = "../results/"
+figure_dir = "../figures/"
 
 # Create the directory tree
 pathlib.Path(f"{result_dir}/{data_type}").mkdir(parents=True, exist_ok=True)
@@ -112,7 +113,7 @@ def get_clf_grid(comps):
     imp, mod = comps
     if imp is not None:
         clf = make_pipeline(
-            clone(imputations[imp]), StandardScaler(), clone(models[mod])
+            StandardScaler(), clone(imputations[imp]), clone(models[mod])
         )
         clf_name = '_'.join(comps)
     else:
@@ -158,6 +159,16 @@ for measure in measures:
     res.columns = model_names
     res.to_csv(f'{result_dir}/{data_type}/{measure}.csv')
 
+best_params = {}
+for c in model_names:
+    param_names = list(results[c]['estimator'][0].best_params_.keys())
+    best_params[c] = {k: [] for k in param_names}
+    for est in results[c]['estimator']:
+        for k in param_names:
+            best_params[c][k].append(est.best_params_[k])
+file = open(f'{result_dir}/{data_type}/best_params.pkl', 'wb')
+pickle.dump(best_params, file)
+file.close()
 
 # Visualize results for the first fold
 for comps in model_components:
