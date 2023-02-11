@@ -213,11 +213,12 @@ for comps in model_components:
          'Yanteles', 'Melimoyu', 'Mentolat', 'Cay'
          'Macá', 'Hudson', 'Lautaro', 'Viedma', 'Aguilera', 'Reclus',
          'Monte Burney'])
+    volcanoes_by_samples = df.Volcano.value_counts().index.to_list()
 
     y_test_names = volcano_list[y_test_out]
     y_pred_names = volcano_list[pred]
     plot_confusion_matrix(
-        y_test_names, y_pred_names, labels=volcanoes_by_latitude,
+        y_test_names, y_pred_names, labels=volcanoes_by_samples,
         name=f'{data_type}/ConfusionMatrix_{clf_name}', dir=figure_dir, save=True
     )
 
