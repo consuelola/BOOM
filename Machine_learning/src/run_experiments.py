@@ -132,10 +132,10 @@ for comps in model_components:
     clf, grid, clf_name = get_clf_grid(comps)
 
     est = GridSearchCV_with_groups(
-        clf, grid, cv_test_size=0.2, cv_n_splits=5, n_jobs=5)
+        clf, grid, cv_test_size=0.2, cv_n_splits=5, n_jobs=30)
 
     # gss = GroupShuffleSplit(test_size=0.2, n_splits=5, random_state=0)
-    gss = StratifiedGroupKFold(n_splits=5, shuffle=True, random_state=0)
+    gss = StratifiedGroupKFold(n_splits=10, shuffle=True, random_state=0)
 
     cv = cross_validate(est,
                         X_volcanoes,
@@ -175,6 +175,7 @@ for comps in model_components:
     clf, grid, clf_name = get_clf_grid(comps)
 
     # recover the first outer cross-validation split
+    gss = StratifiedGroupKFold(n_splits=10, shuffle=True, random_state=0)
     train_out, test_out = next(
         gss.split(X_volcanoes, y=y, groups=SampleID)
     )
@@ -190,8 +191,8 @@ for comps in model_components:
     # have an idea of which samples are badly classified
     plot_scatterplots(X_test_out, y_test_out,
                       'SiO2_normalized', 'K2O_normalized',
-                      est, pred, volcano_list, dir=figure_dir, name=f'{data_type}/{clf_name}',
-                      save=True)
+                      est, pred, volcano_list, dir=figure_dir,
+                      name=f'{data_type}/{clf_name}', save=True)
     if 'traces' in data_type:
         plot_scatterplots(X_test_out, y_test_out, 'SiO2_normalized', 'La',
                           est, pred, volcano_list, dir=figure_dir,
@@ -213,13 +214,13 @@ for comps in model_components:
          'Yanteles', 'Melimoyu', 'Mentolat', 'Cay'
          'Macá', 'Hudson', 'Lautaro', 'Viedma', 'Aguilera', 'Reclus',
          'Monte Burney'])
-    volcanoes_by_samples = df.Volcano.value_counts().index.to_list()
 
     y_test_names = volcano_list[y_test_out]
     y_pred_names = volcano_list[pred]
     plot_confusion_matrix(
-        y_test_names, y_pred_names, labels=volcanoes_by_samples,
-        name=f'{data_type}/ConfusionMatrix_{clf_name}', dir=figure_dir, save=True
+        y_test_names, y_pred_names, labels=volcanoes_by_latitude,
+        name=f'{data_type}/ConfusionMatrix_{clf_name}', dir=figure_dir,
+        save=True
     )
 
     # plot permutation importance
