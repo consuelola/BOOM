@@ -3,7 +3,7 @@ import numpy as np
 import requests
 import pathlib
 import pickle
-
+import argparse
 from itertools import product
 from io import StringIO
 from sklearn.base import clone
@@ -21,10 +21,24 @@ from utils import plot_confusion_matrix
 from utils import get_design_matrix
 from utils import get_models
 
+parser = argparse.ArgumentParser()
+parser.add_argument('data_type', help='which samples and features to use',
+                    choices=[
+                        'majors_only', 'traces_only', 'majors_or_traces',
+                        'majors_and_traces_restricted', 'majors_and_traces'])
+parser.add_argument('--n_jobs', help='the number of cores to be used',
+                    default=1, type=int)
+parser.add_argument('--plot',  help='whether to plot the figures',
+                    action='store_true')
+args = parser.parse_args()
+data_type = args.data_type
+
 # Choose the data to be used for learning.
 # data_type = 'majors_only'
 # data_type = 'traces_only'
-data_type = 'majors_and_traces'
+# data_type = 'majors_or_traces'
+# data_type = 'majors_and_traces_restricted'
+# data_type = 'majors_and_traces'
 
 # Define the root of the output result directory
 result_dir = "../results/"
@@ -84,6 +98,10 @@ for u, c in zip(unique, counts):
           \033[1m{volcano_list[u]}\033[0m, sample observations: {c}'
           )
 
+# Count nb of samples per volcan.
+ct = pd.crosstab(SampleID, y)
+ct.sum(axis=0)
+
 # Visualize the missing data
 # msno.matrix(X_volcanoes)
 # plt.show()
@@ -97,15 +115,16 @@ imputations, models, grids = get_models()
 
 imputation_names = list(imputations.keys())
 model_names = list(models.keys())
-if 'traces' in data_type:
-    model_names.remove('gb')
-    model_components = list(product(imputation_names, model_names))
-    model_components.append((None, 'gb'))  # gb does not require imputation
-else:
+
+if data_type == 'majors_only' or data_type == 'majors_and_traces_restricted':
     # If only majors are used, there are very few missing values so a simple
     # imputation will be used.
     model_names.remove('gb')
     model_components = [('mean_imp', model_name) for model_name in model_names]
+    model_components.append((None, 'gb'))  # gb does not require imputation
+else:
+    model_names.remove('gb')
+    model_components = list(product(imputation_names, model_names))
     model_components.append((None, 'gb'))  # gb does not require imputation
 
 
@@ -132,7 +151,7 @@ for comps in model_components:
     clf, grid, clf_name = get_clf_grid(comps)
 
     est = GridSearchCV_with_groups(
-        clf, grid, cv_test_size=0.2, cv_n_splits=5, n_jobs=30)
+        clf, grid, cv_test_size=0.2, cv_n_splits=5, n_jobs=args.n_jobs)
 
     # gss = GroupShuffleSplit(test_size=0.2, n_splits=5, random_state=0)
     gss = StratifiedGroupKFold(n_splits=10, shuffle=True, random_state=0)
@@ -170,72 +189,74 @@ file = open(f'{result_dir}/{data_type}/best_params.pkl', 'wb')
 pickle.dump(best_params, file)
 file.close()
 
-# Visualize results for the first fold
-for comps in model_components:
-    clf, grid, clf_name = get_clf_grid(comps)
+if args.plot:
+    # Visualize results for the first fold
+    for comps in model_components:
+        clf, grid, clf_name = get_clf_grid(comps)
 
-    # recover the first outer cross-validation split
-    gss = StratifiedGroupKFold(n_splits=10, shuffle=True, random_state=0)
-    train_out, test_out = next(
-        gss.split(X_volcanoes, y=y, groups=SampleID)
-    )
-    # recover the fitted predictor for this split
-    est = results[clf_name]['estimator'][0].best_estimator_
+        # recover the first outer cross-validation split
+        gss = StratifiedGroupKFold(n_splits=10, shuffle=True, random_state=0)
+        train_out, test_out = next(
+            gss.split(X_volcanoes, y=y, groups=SampleID)
+        )
+        # recover the fitted predictor for this split
+        est = results[clf_name]['estimator'][0].best_estimator_
 
-    X_test_out = X_volcanoes.iloc[test_out]
-    y_test_out = y[test_out]
-    pred = est.predict(X_test_out)
-    volcano_list = df_volcanoes.Volcano.cat.categories
+        X_test_out = X_volcanoes.iloc[test_out]
+        y_test_out = y[test_out]
+        pred = est.predict(X_test_out)
+        volcano_list = df_volcanoes.Volcano.cat.categories
 
-    # plot imputation and classification in different scatter plots in order to
-    # have an idea of which samples are badly classified
-    plot_scatterplots(X_test_out, y_test_out,
-                      'SiO2_normalized', 'K2O_normalized',
-                      est, pred, volcano_list, dir=figure_dir,
-                      name=f'{data_type}/{clf_name}', save=True)
-    if 'traces' in data_type:
-        plot_scatterplots(X_test_out, y_test_out, 'SiO2_normalized', 'La',
-                          est, pred, volcano_list, dir=figure_dir,
-                          name=f'{data_type}/{clf_name}', save=True)
-        plot_scatterplots(X_test_out, y_test_out, 'Rb', 'Sr',
-                          est, pred, volcano_list, dir=figure_dir,
-                          name=f'{data_type}/{clf_name}', save=True)
-        plot_scatterplots(X_test_out, y_test_out, 'Cs', 'La',
-                          est, pred, volcano_list, dir=figure_dir,
-                          name=f'{data_type}/{clf_name}', save=True)
+        # plot imputation and classification in different scatter plots in
+        # order to have an idea of which samples are badly classified
+        plot_scatterplots(X_test_out, y_test_out,
+                        'SiO2_normalized', 'K2O_normalized',
+                        est, pred, volcano_list, dir=figure_dir,
+                        name=f'{data_type}/{clf_name}', save=True)
+        if 'traces' in data_type:
+            plot_scatterplots(X_test_out, y_test_out, 'SiO2_normalized', 'La',
+                            est, pred, volcano_list, dir=figure_dir,
+                            name=f'{data_type}/{clf_name}', save=True)
+            plot_scatterplots(X_test_out, y_test_out, 'Rb', 'Sr',
+                            est, pred, volcano_list, dir=figure_dir,
+                            name=f'{data_type}/{clf_name}', save=True)
+            plot_scatterplots(X_test_out, y_test_out, 'Cs', 'La',
+                            est, pred, volcano_list, dir=figure_dir,
+                            name=f'{data_type}/{clf_name}', save=True)
 
-    # plot the confusion matrix
-    volcanoes_by_latitude = np.asarray(
-        ['Llaima', 'Sollipulli', 'Caburga-Huelemolle', 'Villarrica',
-         'Quetrupillán', 'Lanín', 'Huanquihue Group', 'Mocho-Choshuenco',
-         'Carrán-Los Venados', 'Puyehue-Cordón Caulle',
-         'Antillanca-Casablanca', 'Osorno', 'Calbuco', 'Yate', 'Apagado',
-         'Hornopirén', 'Huequi', 'Michinmahuida', 'Chaitén', 'Corcovado',
-         'Yanteles', 'Melimoyu', 'Mentolat', 'Cay'
-         'Macá', 'Hudson', 'Lautaro', 'Viedma', 'Aguilera', 'Reclus',
-         'Monte Burney'])
+        # plot the confusion matrix
+        volcanoes_by_latitude = np.asarray(
+            ['Llaima', 'Sollipulli', 'Caburga-Huelemolle', 'Villarrica',
+            'Quetrupillán', 'Lanín', 'Huanquihue Group', 'Mocho-Choshuenco',
+            'Carrán-Los Venados', 'Puyehue-Cordón Caulle',
+            'Antillanca-Casablanca', 'Osorno', 'Calbuco', 'Yate', 'Apagado',
+            'Hornopirén', 'Huequi', 'Michinmahuida', 'Chaitén', 'Corcovado',
+            'Yanteles', 'Melimoyu', 'Mentolat', 'Cay'
+            'Macá', 'Hudson', 'Lautaro', 'Viedma', 'Aguilera', 'Reclus',
+            'Monte Burney'])
 
-    y_test_names = volcano_list[y_test_out]
-    y_pred_names = volcano_list[pred]
-    plot_confusion_matrix(
-        y_test_names, y_pred_names, labels=volcanoes_by_latitude,
-        name=f'{data_type}/ConfusionMatrix_{clf_name}', dir=figure_dir,
-        save=True
-    )
+        y_test_names = volcano_list[y_test_out]
+        y_pred_names = volcano_list[pred]
+        plot_confusion_matrix(
+            y_test_names, y_pred_names, labels=volcanoes_by_latitude,
+            name=f'{data_type}/ConfusionMatrix_{clf_name}', dir=figure_dir,
+            save=True
+        )
 
-    # plot permutation importance
-    result = permutation_importance(
-        est, X_test_out, y_test_out, n_repeats=10, random_state=42, n_jobs=3
-    )
-    sorted_idx = result.importances_mean.argsort()
+        # plot permutation importance
+        result = permutation_importance(
+            est, X_test_out, y_test_out, n_repeats=10, random_state=42,
+            n_jobs=3
+        )
+        sorted_idx = result.importances_mean.argsort()
 
-    fig, ax = plt.subplots(figsize=(8, 8))
-    ax.boxplot(result.importances[sorted_idx].T, vert=False,
-               labels=X_test_out.columns[sorted_idx]
-               )
-    ax.set_title("Permutation Importances (test set)")
-    fig.tight_layout()
-    plt.savefig(
-        f'{figure_dir}/{data_type}/permutation_importance_{clf_name}.png',
-        dpi=300, bbox_inches='tight')
-    plt.close()
+        fig, ax = plt.subplots(figsize=(8, 8))
+        ax.boxplot(result.importances[sorted_idx].T, vert=False,
+                labels=X_test_out.columns[sorted_idx]
+                )
+        ax.set_title("Permutation Importances (test set)")
+        fig.tight_layout()
+        plt.savefig(
+            f'{figure_dir}/{data_type}/permutation_importance_{clf_name}.png',
+            dpi=300, bbox_inches='tight')
+        plt.close()

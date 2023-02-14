@@ -3,7 +3,10 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 geochem = 'majors_and_traces'
-file_accuracies = f'../results/{geochem}/test_accuracy.csv'
+# geochem = 'majors_and_traces_restricted'
+# filename = 'test_accuracy'
+filename = 'test_balanced_accuracy'
+file_accuracies = f'../results/{geochem}/{filename}.csv'
 acc = pd.read_csv(file_accuracies, index_col=0)
 
 # Convert from wide to long format
@@ -23,6 +26,8 @@ acc['predictor'] = [s[j:] for s, j in zip(acc.method, pos)]
 
 # Plot boxplots
 sns.boxplot(data=acc, x='test_accuracy', y='predictor', hue='imputer')
-plt.savefig(f'../figures/{geochem}/test_accuracy.pdf',
+if 'balanced' in filename:
+    plt.xlabel('balanced test accuracy')
+plt.savefig(f'../figures/{geochem}/{filename}.pdf',
             dpi=300, bbox_inches='tight')
 plt.close()

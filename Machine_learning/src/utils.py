@@ -317,7 +317,7 @@ def get_design_matrix(df_volcanoes, data_type):
               'Ho', 'Er', 'Tm', 'Yb', 'Lu', 'Hf', 'Ta', 'Pb',
               'Th', 'U']
 
-    if data_type == 'majors_and_traces':
+    if data_type == 'majors_or_traces':
         X_major = df_volcanoes.loc[:, majors]
         X_traces = df_volcanoes.loc[:, traces]
         X_volcanoes = pd.concat([X_major, X_traces], axis=1)
@@ -340,6 +340,21 @@ def get_design_matrix(df_volcanoes, data_type):
         X_volcanoes = X_traces.iloc[ind_not_all_na, ]
         df_volcanoes = df_volcanoes.iloc[ind_not_all_na, ]
 
+    elif 'majors_and_traces' in data_type:
+        X_major = df_volcanoes.loc[:, majors]
+        X_traces = df_volcanoes.loc[:, traces]
+        mask_major = X_major.isna()
+        mask_traces = X_traces.isna()
+        ind_major_not_all_na = np.where(
+            mask_major.sum(axis=1) != X_major.shape[1])[0]
+        ind_traces_not_all_na = np.where(
+            mask_traces.sum(axis=1) != X_traces.shape[1])[0]
+        ind = np.intersect1d(ind_major_not_all_na, ind_traces_not_all_na)
+        df_volcanoes = df_volcanoes.iloc[ind, ]
+        X_volcanoes = pd.concat([X_major, X_traces], axis=1)
+        X_volcanoes = X_volcanoes.iloc[ind, ]
+        if 'restricted' in data_type:
+            X_volcanoes = X_volcanoes.loc[:, traces]
     else:
         raise ValueError(f'`data_type` is {data_type}. Should be one of\
              majors_and_traces, majors_only or  traces_only')
