@@ -2,8 +2,8 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-filename = 'test_accuracy'
-# filename = 'test_balanced_accuracy'
+# filename = 'test_accuracy'
+filename = 'test_balanced_accuracy'
 
 geochem = 'majors_and_traces'
 file_acc = f'../results/{geochem}/{filename}.csv'
@@ -39,14 +39,28 @@ tmp = (acc.imputer == 'mean') | (acc.imputer == '')
 acc = acc.loc[tmp, :]
 
 # Concatenate the two dataframes
-acc['elements'] = 'majors and traces'
-acc_r['elements'] = 'majors'
+acc['Elements'] = 'majors and traces'
+acc_r['Elements'] = 'majors only'
 df = pd.concat([acc, acc_r], axis=0)
 
+# Rename models with complete names
+d = {
+    'knn': 'k-Nearest \n Neighbors',
+    'rf': 'Random \n Forest',
+    'gb': 'Gradient \n Boosting',
+    'lr': 'Logistic \n Regression'
+}
+df.predictor = df.predictor.map(d)
+
 # Plot boxplots
-sns.boxplot(data=df, x='test_accuracy', y='predictor', hue='elements')
+plt.grid(axis='x')
+ax = sns.boxplot(data=df, x='test_accuracy', y='predictor', hue='Elements')
+ax.set_axisbelow(True)
 if 'balanced' in filename:
-    plt.xlabel('balanced test accuracy')
+    plt.xlabel('Test balanced accuracy')
+else:
+    plt.xlabel('Test accuracy')
+plt.ylabel('')
 plt.savefig(f'../figures/{filename}_w_vs_wo_traces.pdf',
             dpi=300, bbox_inches='tight')
 plt.close()
