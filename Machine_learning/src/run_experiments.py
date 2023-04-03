@@ -50,8 +50,10 @@ pathlib.Path(f"{figure_dir}/{data_type}").mkdir(parents=True, exist_ok=True)
 
 # Download the dataset from the ESPRI server as .csv
 url = "https://data.ipsl.fr/repository/TephraDatabase/TephraDataBase.csv"
-s = requests.get(url).text
-df = pd.read_csv(StringIO(s), encoding="latin1", low_memory=False)
+r = requests.get(url)
+r.encoding = "utf-8"
+s = r.text
+df = pd.read_csv(StringIO(s), low_memory=False)
 
 # in case the ESPRI server is down:
 # df = pd.read_csv(
