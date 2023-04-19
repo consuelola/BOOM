@@ -1,19 +1,19 @@
-Volcano,Event,Color,SimbologÌa
+Volcano,Event,Color,Simbolog√≠a
 Aguilera,A1,lightcoral,3
 Aguilera,Unknown,lightcoral,.
-Antillanca-Casablanca,Rayhuen,#fe4b03,4
-Antillanca-Casablanca,Playas Blanca-Negra,#fe4b03,5
-Antillanca-Casablanca,Nahuel Huapi,#fe4b03,6
-Antillanca-Casablanca,Unknown,#fe4b03,.
-Apagado,Ap1,lightskyblue,4
-Apagado,Unknown,lightskyblue,.
+Grupo Antillanca,Rayhuen,#fe4b03,4
+Grupo Antillanca,Playas Blanca-Negra,#fe4b03,5
+Grupo Antillanca,Nahuel Huapi,#fe4b03,6
+Grupo Antillanca,Unknown,#fe4b03,.
+Apagado o Hualaihu√©,Ap1,lightskyblue,4
+Apagado o Hualaihu√©,Unknown,lightskyblue,.
 Arenales,Unknown,palegreen,.
 Monte Burney,Unknown,rosybrown,.
 Monte Burney,MB1910,rosybrown,4
 Monte Burney,MB1,rosybrown,5
 Monte Burney,MB2,rosybrown,6
-Caburga-Huelemolle,Caburga-Huelemolle,rebeccapurple,3
-Caburga-Huelemolle,Unknown,rebeccapurple,.
+Caburgua-Huelemolles-Relicura,Caburga-Huelemolle,rebeccapurple,3
+Caburgua-Huelemolles-Relicura,Unknown,rebeccapurple,.
 Calbuco,Calbuco 1792,green,","
 Calbuco,Calbuco 1893,green,1'
 Calbuco,Calbuco 2015,green,2'
@@ -32,28 +32,28 @@ Calbuco,Alerce Ignimbrite,green,5
 Calbuco,Ca13,green,6
 Calbuco,Ca12,green,7
 Calbuco,Unknown,green,.
-Carr·n-Los Venados,Carr·n1955,indigo,4
-Carr·n-Los Venados,RiÒinahue1907,indigo,5
-Carr·n-Los Venados,Unknown,indigo,.
+Carr√°n-Los Venados,Carr√°n1955,indigo,4
+Carr√°n-Los Venados,Ri√±inahue1907,indigo,5
+Carr√°n-Los Venados,Unknown,indigo,.
 Cay,Unknown,#0a5f38,.
-ChaitÈn,Cha1,teal,1'
-ChaitÈn,Cha2,teal,2'
-ChaitÈn,Cha3,teal,3'
-ChaitÈn,Cha4,teal,4'
-ChaitÈn,Grande,teal,+'
-ChaitÈn,Puma Verde,teal,X'
-ChaitÈn,PumalÌn,teal,|'
-ChaitÈn,Vcha-2008,teal,_'
-ChaitÈn,Vilc˙n,teal,0
-ChaitÈn,Unknown,teal,.
+Chait√©n,Cha1,teal,1'
+Chait√©n,Cha2,teal,2'
+Chait√©n,Cha3,teal,3'
+Chait√©n,Cha4,teal,4'
+Chait√©n,Grande,teal,+'
+Chait√©n,Puma Verde,teal,X'
+Chait√©n,Pumal√≠n,teal,|'
+Chait√©n,Vcha-2008,teal,_'
+Chait√©n,Vilc√∫n,teal,0
+Chait√©n,Unknown,teal,.
 Corcovado,COR3,#fa2a55,4
 Corcovado,COR2,#fa2a55,5
 Corcovado,Unknown,#fa2a55,.
-CordÛn Cabrera,Unknown,#c69c04,.
+Cord√≥n Cabrera,Unknown,#c69c04,.
 Fueguino,Unknown,deepskyblue,.
-HornopirÈn,Ho1,darkblue,4
-HornopirÈn,HoSc,darkblue,5
-HornopirÈn,Unknown,darkblue,.
+Hornopir√©n,Ho1,darkblue,4
+Hornopir√©n,HoSc,darkblue,5
+Hornopir√©n,Unknown,darkblue,.
 Huanquihue Group,Achen,deeppink,4
 Huanquihue Group,HUA1,deeppink,5
 Huanquihue Group,Unknown,deeppink,.
@@ -72,9 +72,9 @@ Huequi,T1,slateblue,4
 Huequi,T2,slateblue,5
 Huequi,T2,slateblue,6
 Huequi,Unknown,slateblue,.
-LanÌn,Lan2,#feb209,4
-LanÌn,Lan1,#feb209,5
-LanÌn,Unknown,#feb209,.
+Lan√≠n,Lan2,#feb209,4
+Lan√≠n,Lan1,#feb209,5
+Lan√≠n,Unknown,#feb209,.
 Lautaro,Unknown,Chocolate,.
 Lautaro,Lautaro1933,Chocolate,4
 Lautaro,Lautaro1876/78-79,Chocolate,5
@@ -90,12 +90,12 @@ Llaima,1903 Llaima,orange,1
 Llaima,1640 Llaima,orange,2
 Llaima,1852 Llaima,orange,3
 Llaima,Llaima Pumice,orange,4
-Llaima,CuracautÌn,orange,5
-Llaima,CuracautÌn 1,orange,6
-Llaima,CuracautÌn 2,orange,7
+Llaima,Curacaut√≠n,orange,5
+Llaima,Curacaut√≠n 1,orange,6
+Llaima,Curacaut√≠n 2,orange,7
 Llaima,Unknown,orange,.
-Mac·,MAC1,#01b44c,4
-Mac·,Unknown,#01b44c,.
+Mac√°,MAC1,#01b44c,4
+Mac√°,Unknown,#01b44c,.
 Melimoyu,Santa Ana,#80f9ad,4
 Melimoyu,La Junta,#80f9ad,5
 Melimoyu,Unknown,#80f9ad,.
@@ -105,7 +105,7 @@ Mentolat,MENo,violet,6
 Mentolat,MEN-1,violet,7
 Mentolat,Unknown,violet,.
 Michinmahuida,MIC1,turquoise,4
-Michinmahuida,LepuÈ,turquoise,5
+Michinmahuida,Lepu√©,turquoise,5
 test,Yelcho,Paleturquoise,6
 Michinmahuida,Unknown,turquoise,.
 Mocho-Choshuenco,MC1,hotpink,","
@@ -126,11 +126,11 @@ Mocho-Choshuenco,Enco,hotpink,5
 Mocho-Choshuenco,Hua-hum,hotpink,6
 Mocho-Choshuenco,MC19,hotpink,7
 Mocho-Choshuenco,MC20,hotpink,8
-Mocho-Choshuenco,PilmaiquÈn,hotpink,9
+Mocho-Choshuenco,Pilmaiqu√©n,hotpink,9
 Mocho-Choshuenco,MC22,hotpink,10
 Mocho-Choshuenco,Arauco,hotpink,11
 Mocho-Choshuenco,MC24,hotpink,4'
-Mocho-Choshuenco,RiÒihue,hotpink,+'
+Mocho-Choshuenco,Ri√±ihue,hotpink,+'
 Mocho-Choshuenco,MC26,hotpink,X'
 Mocho-Choshuenco,MC27,hotpink,|'
 Mocho-Choshuenco,Unknown,hotpink,.
@@ -141,41 +141,41 @@ Osorno,Cono Appel,#bffe28,8
 Osorno,Unknown,#bffe28,.
 Puntiagudo,Puntiagudo,y,5
 Puntiagudo,Unknown,y,.
-Puyehue-CordÛn Caulle,PCC2011,gold,1
-Puyehue-CordÛn Caulle,PCC1922,gold,2
-Puyehue-CordÛn Caulle,PCC1960,gold,3
-Puyehue-CordÛn Caulle,North CordÛn Caulle,gold,4
-Puyehue-CordÛn Caulle,Mil Hojas,gold,5
-Puyehue-CordÛn Caulle,Below Mil hojas,gold,6
-Puyehue-CordÛn Caulle,PCC4,gold,7
-Puyehue-CordÛn Caulle,Ranco,gold,8
-Puyehue-CordÛn Caulle,PCC2,gold,9
-Puyehue-CordÛn Caulle,Puyehue 2,gold,10
-Puyehue-CordÛn Caulle,Puyehue 1,gold,11
-Puyehue-CordÛn Caulle,PCC1,gold,12
-Puyehue-CordÛn Caulle,Unknown,gold,.
-Quetrupill·n,Quet6,red,4
-Quetrupill·n,Quet5,red,5
-Quetrupill·n,Puesco,red,6
-Quetrupill·n,Quet5?,red,7
-Quetrupill·n,Quet3,red,8
-Quetrupill·n,Quet2,red,+'
-Quetrupill·n,Quet1,red,X'
-Quetrupill·n,Unknown,red,.
+Puyehue-Cord√≥n Caulle,PCC2011,gold,1
+Puyehue-Cord√≥n Caulle,PCC1922,gold,2
+Puyehue-Cord√≥n Caulle,PCC1960,gold,3
+Puyehue-Cord√≥n Caulle,North Cord√≥n Caulle,gold,4
+Puyehue-Cord√≥n Caulle,Mil Hojas,gold,5
+Puyehue-Cord√≥n Caulle,Below Mil hojas,gold,6
+Puyehue-Cord√≥n Caulle,PCC4,gold,7
+Puyehue-Cord√≥n Caulle,Ranco,gold,8
+Puyehue-Cord√≥n Caulle,PCC2,gold,9
+Puyehue-Cord√≥n Caulle,Puyehue 2,gold,10
+Puyehue-Cord√≥n Caulle,Puyehue 1,gold,11
+Puyehue-Cord√≥n Caulle,PCC1,gold,12
+Puyehue-Cord√≥n Caulle,Unknown,gold,.
+Quetrupill√°n,Quet6,red,4
+Quetrupill√°n,Quet5,red,5
+Quetrupill√°n,Puesco,red,6
+Quetrupill√°n,Quet5?,red,7
+Quetrupill√°n,Quet3,red,8
+Quetrupill√°n,Quet2,red,+'
+Quetrupill√°n,Quet1,red,X'
+Quetrupill√°n,Unknown,red,.
 Reclus,R1,Paleturquoise,X'
 Reclus,R2/R3,Paleturquoise,5
 Reclus,Unknown,Paleturquoise,.
-Sollipulli,AlpehuÈ,saddlebrown,5
-Sollipulli,ChufquÈn,saddlebrown,6
+Sollipulli,Alpehu√©,saddlebrown,5
+Sollipulli,Chufqu√©n,saddlebrown,6
 Sollipulli,Unknown,saddlebrown,.
 Subsidiary Vcha dome,Unknown,Paleturquoise,.
 Viedma,Unknown,steelblue,.
 Villarrica,Villarrica 1984,brown,5
 Villarrica,Villarrica 1971,brown,6
 Villarrica,Chaimilla,brown,7
-Villarrica,PucÛn,brown,8
-Villarrica,Lic·n?,brown,9
-Villarrica,Lic·n,brown,X'
+Villarrica,Puc√≥n,brown,8
+Villarrica,Lic√°n?,brown,9
+Villarrica,Lic√°n,brown,X'
 Villarrica,Unknown,brown,.
 Yanteles,YAN1,yellow,X'
 Yanteles,Unknown,yellow,.
