@@ -9,8 +9,7 @@ from io import StringIO
 from sklearn.base import clone
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
-from sklearn.model_selection import cross_validate, GroupShuffleSplit,\
-    StratifiedGroupKFold
+from sklearn.model_selection import cross_validate, StratifiedGroupKFold
 from sklearn.inspection import permutation_importance
 import matplotlib.pyplot as plt
 # import missingno as msno
@@ -155,7 +154,6 @@ for comps in model_components:
     est = GridSearchCV_with_groups(
         clf, grid, cv_test_size=0.2, cv_n_splits=5, n_jobs=args.n_jobs)
 
-    # gss = GroupShuffleSplit(test_size=0.2, n_splits=5, random_state=0)
     gss = StratifiedGroupKFold(n_splits=10, shuffle=True, random_state=0)
 
     cv = cross_validate(est,
@@ -212,30 +210,31 @@ if args.plot:
         # plot imputation and classification in different scatter plots in
         # order to have an idea of which samples are badly classified
         plot_scatterplots(X_test_out, y_test_out,
-                        'SiO2_normalized', 'K2O_normalized',
-                        est, pred, volcano_list, dir=figure_dir,
-                        name=f'{data_type}/{clf_name}', save=True)
-        if 'traces' in data_type:
+                          'SiO2_normalized', 'K2O_normalized',
+                          est, pred, volcano_list, dir=figure_dir,
+                          name=f'{data_type}/{clf_name}', save=True)
+        if data_type in ['traces_only', 'majors_or_traces',
+                         'majors_and_traces']:
             plot_scatterplots(X_test_out, y_test_out, 'SiO2_normalized', 'La',
-                            est, pred, volcano_list, dir=figure_dir,
-                            name=f'{data_type}/{clf_name}', save=True)
+                              est, pred, volcano_list, dir=figure_dir,
+                              name=f'{data_type}/{clf_name}', save=True)
             plot_scatterplots(X_test_out, y_test_out, 'Rb', 'Sr',
-                            est, pred, volcano_list, dir=figure_dir,
-                            name=f'{data_type}/{clf_name}', save=True)
+                              est, pred, volcano_list, dir=figure_dir,
+                              name=f'{data_type}/{clf_name}', save=True)
             plot_scatterplots(X_test_out, y_test_out, 'Cs', 'La',
-                            est, pred, volcano_list, dir=figure_dir,
-                            name=f'{data_type}/{clf_name}', save=True)
+                              est, pred, volcano_list, dir=figure_dir,
+                              name=f'{data_type}/{clf_name}', save=True)
 
         # plot the confusion matrix
         volcanoes_by_latitude = np.asarray(
             ['Llaima', 'Sollipulli', 'Caburga-Huelemolle', 'Villarrica',
-            'Quetrupillán', 'Lanín', 'Huanquihue Group', 'Mocho-Choshuenco',
-            'Carrán-Los Venados', 'Puyehue-Cordón Caulle',
-            'Antillanca-Casablanca', 'Osorno', 'Calbuco', 'Yate', 'Apagado',
-            'Hornopirén', 'Huequi', 'Michinmahuida', 'Chaitén', 'Corcovado',
-            'Yanteles', 'Melimoyu', 'Mentolat', 'Cay'
-            'Macá', 'Hudson', 'Lautaro', 'Viedma', 'Aguilera', 'Reclus',
-            'Monte Burney'])
+             'Quetrupillán', 'Lanín', 'Huanquihue Group', 'Mocho-Choshuenco',
+             'Carrán-Los Venados', 'Puyehue-Cordón Caulle',
+             'Antillanca-Casablanca', 'Osorno', 'Calbuco', 'Yate', 'Apagado',
+             'Hornopirén', 'Huequi', 'Michinmahuida', 'Chaitén', 'Corcovado',
+             'Yanteles', 'Melimoyu', 'Mentolat', 'Cay'
+             'Macá', 'Hudson', 'Lautaro', 'Viedma', 'Aguilera', 'Reclus',
+             'Monte Burney'])
 
         y_test_names = volcano_list[y_test_out]
         y_pred_names = volcano_list[pred]
@@ -254,8 +253,8 @@ if args.plot:
 
         fig, ax = plt.subplots(figsize=(8, 8))
         ax.boxplot(result.importances[sorted_idx].T, vert=False,
-                labels=X_test_out.columns[sorted_idx]
-                )
+                   labels=X_test_out.columns[sorted_idx]
+                   )
         ax.set_title("Permutation Importances (test set)")
         fig.tight_layout()
         plt.savefig(

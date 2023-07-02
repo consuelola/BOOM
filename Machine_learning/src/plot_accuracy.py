@@ -2,8 +2,8 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-geochem = 'majors_or_traces'
-# geochem = 'majors_and_traces'
+# geochem = 'majors_or_traces'
+geochem = 'majors_and_traces'
 # geochem = 'majors_and_traces_restricted'
 filename = 'test_accuracy'
 # filename = 'test_balanced_accuracy'

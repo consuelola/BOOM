@@ -354,10 +354,11 @@ def get_design_matrix(df_volcanoes, data_type):
         X_volcanoes = pd.concat([X_major, X_traces], axis=1)
         X_volcanoes = X_volcanoes.iloc[ind, ]
         if 'restricted' in data_type:
-            X_volcanoes = X_volcanoes.loc[:, traces]
+            X_volcanoes = X_volcanoes.loc[:, majors]
     else:
         raise ValueError(f'`data_type` is {data_type}. Should be one of\
-             majors_and_traces, majors_only or  traces_only')
+             majors_or_traces, majors_only or  traces_only',
+             'majors_and_traces', 'majors_and_traces_restricted')
 
     return df_volcanoes, X_volcanoes
 
@@ -370,7 +371,8 @@ def get_models():
                 'kneighborsclassifier__weights': ['uniform', 'distance']}
 
     # Multinomial logistic regression
-    lr = LogisticRegression(multi_class='multinomial', class_weight='balanced')
+    lr = LogisticRegression(multi_class='multinomial', class_weight='balanced',
+                            random_state=0)
     grid_lr = {'logisticregression__C': [1, 1e1, 1e2, 5e2],
                'logisticregression__solver': ['saga']}
 
@@ -378,12 +380,12 @@ def get_models():
     # usar bootstrap false o class weight balanced_subsample no tiene gran
     # efecto!
     rf = RandomForestClassifier(class_weight='balanced', bootstrap=False,
-                                verbose=0)
+                                verbose=0, random_state=0)
     grid_rf = {'randomforestclassifier__n_estimators': [50, 100, 200],
                'randomforestclassifier__min_samples_leaf': [1, 5]}
 
     # Gradient Boosting
-    gb = HistGradientBoostingClassifier()
+    gb = HistGradientBoostingClassifier(random_state=0)
     grid_gb = {
         'histgradientboostingclassifier__learning_rate':
             [1e-2, 1e-1, 1],
@@ -400,13 +402,11 @@ def get_models():
     knn_imp = KNNImputer(n_neighbors=15, weights='distance')
 
     # Iterative Imputer with Bayesian Ridge
-    # br_imp = IterativeImputer(estimator=BayesianRidge(), min_value=0)
-    br_imp = IterativeImputer(estimator=BayesianRidge())
+    br_imp = IterativeImputer(estimator=BayesianRidge(), random_state=0)
 
     # Iterative Imputer with Random Forest
-    est_rf = RandomForestRegressor(n_estimators=30)
-    # rf_imp = IterativeImputer(estimator=est_rf, min_value=0)
-    rf_imp = IterativeImputer(estimator=est_rf)
+    est_rf = RandomForestRegressor(n_estimators=30, random_state=0)
+    rf_imp = IterativeImputer(estimator=est_rf, random_state=0)
 
     # Define the imputation-model combinations to be tested
     # -----------------------------------------------------
@@ -419,9 +419,8 @@ def get_models():
 
 
 def simbologia(volcano, event):
-
     simbología = pd.read_csv('../../Scripts/Simbologia.csv',
-                             encoding='latin1', low_memory=False)
+                             encoding='utf-8', low_memory=False)
     Event = simbología.loc[simbología['Volcano'] == volcano]
     Event = Event.loc[Event['Event'] == event]
     coloR = Event.values[0, 2]
@@ -438,7 +437,7 @@ def colores(Y, type):
 
     if type == 'event':
         simbología = pd.read_csv('../../Scripts/Simbologia.csv',
-                                 encoding='latin1', low_memory=False)
+                                 encoding='utf-8', low_memory=False)
         for event in np.unique(Y):
             # print(event)
             color, marker = simbologia(
